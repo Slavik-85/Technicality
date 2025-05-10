@@ -25,11 +25,11 @@ import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.*;
 
 public class Disabler extends Module {
-    // 删除原来的disablerTicks
-    // 修改后的成员变量
+
     private ButtonSetting hypixelMode;
     private ButtonSetting hypixelMotionMode;
     private SliderSetting activationDelay;
+    private ButtonSetting resetDisabler;
 
     int tickCounter = 0;
     boolean waitingForGround = false;
@@ -47,7 +47,6 @@ public class Disabler extends Module {
     private long lastDotUpdate;
     private boolean hasPrintedRunningMessage = false; // 新增状态变量
 
-    // 新增进度条相关变量
     private float barWidth = 80;
     private float barHeight = 5;
     private float filledWidth;
@@ -59,21 +58,22 @@ public class Disabler extends Module {
     private boolean reset;
     private float savedYaw, savedPitch;
     private boolean worldJoin;
+    private int wDelay;
 
     public boolean disablerLoaded, running;
 
     public Disabler() {
         super("Disabler", category.world);
-        // 使用新构造函数并传递this（当前模块实例）
+
         this.registerSetting(hypixelMode = new ButtonSetting("Hypixel", this, true));
         this.registerSetting(hypixelMotionMode = new ButtonSetting("HypixelMotion", this, false));
         this.registerSetting(activationDelay = new SliderSetting("Activation delay", " seconds", 0, 0, 4, 0.5));
+        this.registerSetting(resetDisabler = new ButtonSetting("§cReset", false));
 
-        // 设置互斥属性
         hypixelMode.setExclusive(true);
         hypixelMotionMode.setExclusive(true);
     }
-    // 在按钮切换时处理互斥逻辑
+
     @Override
     public void guiButtonToggled(ButtonSetting b) {
         if (b == hypixelMode && b.isToggled()) {
@@ -84,7 +84,6 @@ public class Disabler extends Module {
         }
     }
 
-    // 获取当前tick数的方法
     private int getDisablerTicks() {
         return hypixelMode.isToggled() ? 130 : 140;
     }
@@ -93,7 +92,7 @@ public class Disabler extends Module {
         if (!disablerLoaded) {
             resetState();
         }
-        // 初始化进度条位置
+
         final ScaledResolution scaledResolution = new ScaledResolution(mc);
         barX = scaledResolution.getScaledWidth() / 2 - barWidth / 2;
         barY = scaledResolution.getScaledHeight() / 2 + 28; // 调整到文本下方
@@ -133,6 +132,12 @@ public class Disabler extends Module {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onPreMotion(PreMotionEvent e) {
+        if (resetDisabler.isToggled()) {
+            Utils.print("&7[&dR&7] &cdisabler resetting...");            Utils.print("&7[&dR&7] &cdisabler resetting...");
+            resetState();
+            disablerLoaded = false;            disablerLoaded = false;
+            resetDisabler.disable();            resetDisabler.disable();
+        }
         if (Utils.getLobbyStatus() == 1 || Utils.hypixelStatus() != 1 || Utils.isReplay()) {
             return;
         }
@@ -151,12 +156,13 @@ public class Disabler extends Module {
             return;
         }
         running = true;
-        e.setRotations(savedYaw, savedPitch);
+        e.setRotations(0, savedPitch);
 
         if (waitingForGround) {
             /*if (mc.thePlayer.ticksExisted <= 3) {
                 waitingForGround = false;
                 worldJoin = true;
+                wDelay = 0;
             }
             else */
             if (mc.thePlayer.onGround) {
@@ -167,14 +173,14 @@ public class Disabler extends Module {
             return;
         }
 
-        if (ModuleUtils.inAirTicks >= 10 || worldJoin) {
+        if (ModuleUtils.inAirTicks >= 10 || worldJoin && ++wDelay >= 3) {
             if (!applyingMotion) {
                 applyingMotion = true;
                 firstY = mc.thePlayer.posY;
             }
 
-            if (tickCounter < getDisablerTicks()) { // 修改这里
-                // 添加条件判断确保只打印一次
+            if (tickCounter < getDisablerTicks()) {
+
                 if (!hasPrintedRunningMessage) {
                     Utils.print("&7[&dR&7] running disabler...");
                     hasPrintedRunningMessage = true;
@@ -188,7 +194,7 @@ public class Disabler extends Module {
                 if (mc.thePlayer.posY != firstY) {
                     if (!reset) {
                         resetState();
-                        activationDelayMillis = 5000;
+                        activationDelayMillis = 2000;
                         reset = true;
                         Utils.print("&7[&dR&7] &adisabler reset, wait a few seconds...");
                     } else {
