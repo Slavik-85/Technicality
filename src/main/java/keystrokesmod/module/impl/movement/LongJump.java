@@ -1,5 +1,7 @@
 package keystrokesmod.module.impl.movement;
 
+import keystrokesmod.Raven;
+import keystrokesmod.event.PrePlayerInputEvent;
 import keystrokesmod.event.*;
 import keystrokesmod.mixin.impl.accessor.IAccessorMinecraft;
 import keystrokesmod.mixin.interfaces.IMixinItemRenderer;
@@ -9,53 +11,56 @@ import keystrokesmod.module.impl.render.HUD;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.KeySetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
-import keystrokesmod.utility.ModuleUtils;
-import keystrokesmod.utility.Theme;
-import keystrokesmod.utility.Utils;
+import keystrokesmod.utility.*;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.network.play.server.*;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.MathHelper;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class LongJump extends Module {
-	private final SliderSetting mode;
+	private SliderSetting mode;
 
-	private final SliderSetting boostSetting;
-	private final SliderSetting verticalMotion;
-	private final SliderSetting motionDecay;
+	private SliderSetting boostSetting;
+	private SliderSetting motionTicks;
+	private SliderSetting verticalMotion;
+	private SliderSetting motionDecay;
 
-	private final ButtonSetting manual;
-	private final ButtonSetting onlyWithVelocity;
-	private final KeySetting disableKey, flatKey;
+	private ButtonSetting manual;
+	private ButtonSetting onlyWithVelocity;
+	private KeySetting disableKey, flatKey;
 
-	private final ButtonSetting allowStrafe;
-	private final ButtonSetting invertYaw;
-	private final ButtonSetting stopMovement;
-	private final ButtonSetting hideExplosion;
-	public final ButtonSetting spoofItem;
-	private final ButtonSetting beginFlat;
-	private final ButtonSetting silentSwing;
-	private final ButtonSetting renderFloatProgress;
+	private ButtonSetting allowStrafe;
+	private ButtonSetting invertYaw;
+	private ButtonSetting stopMovement;
+	private ButtonSetting hideExplosion;
+	public ButtonSetting spoofItem;
+	private ButtonSetting beginFlat;
+	private ButtonSetting silentSwing;
+	private ButtonSetting renderFloatProgress;
 
-	private final KeySetting verticalKey;
+	private KeySetting verticalKey;
+	private SliderSetting pitchVal;
 
-	public final String[] modes = new String[]{"Hypixel", "Boost", "WatchDog Damage"};
+	public String[] modes = new String[]{"Hypixel", "Boost"};
 
 	private boolean manualWasOn;
+
+	private float yaw;
+	private float pitch;
 
 	private boolean notMoving;
 	private boolean enabled, swapped;
@@ -67,12 +72,11 @@ public class LongJump extends Module {
 	public int lastSlot = -1, spoofSlot = -1;
 	private int stopTime;
 	private int rotateTick;
-
-	private float yaw, pitch;
+	private int motionDecayVal;
 
 	private long fireballTime;
-	private final long MAX_EXPLOSION_DIST_SQ = 9;
-	private final long FIREBALL_TIMEOUT = 750L;
+	private long MAX_EXPLOSION_DIST_SQ = 9;
+	private long FIREBALL_TIMEOUT = 750L;
 
 	public static boolean stopVelocity;
 	public static boolean stopModules;
@@ -84,26 +88,12 @@ public class LongJump extends Module {
 	private int color = new Color(0, 187, 255, 255).getRGB();
 
 	// 新增进度条变量
-	private final float barWidth = 80;
-	private final float barHeight = 5;
+	private float barWidth = 80;
+	private float barHeight = 5;
 	private float filledWidth;
 	private float barX, barY;
 	private final int borderColor = new Color(30, 30, 30, 200).getRGB();
 
-
-	/*MoonLight Code Begin*/
-	static class DamageContainer {
-		static final int MODE = 2;
-		static int dmgTicks = 0;
-
-		static boolean velo = false;
-		static int ticksSinceVelocity = 0;
-		static int ticks = 0;
-		static double distance = 0;
-		static int lastSlot = -1;
-
-	}
-	/*MoonLight Code End*/
 
 	public LongJump() {
 		super("Long Jump", category.movement);
@@ -127,7 +117,6 @@ public class LongJump extends Module {
 		this.registerSetting(beginFlat = new ButtonSetting("Begin flat", false));
 		this.registerSetting(verticalKey = new KeySetting("Vertical key", Keyboard.KEY_SPACE));
 		this.registerSetting(flatKey = new KeySetting("Flat key", Keyboard.KEY_SPACE));
-
 	}
 
 	public void guiUpdate() {
@@ -160,28 +149,10 @@ public class LongJump extends Module {
 		int[] disp = {scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(), scaledResolution.getScaleFactor()};
 		barX = scaledResolution.getScaledWidth() / 2 - barWidth / 2;
 		barY = scaledResolution.getScaledHeight() / 2 + 28; // 下移16像素
-
-
-
-
-		/*MoonLight Code Begin*/
-
-		DamageContainer.lastSlot = mc.thePlayer.inventory.currentItem;
-		DamageContainer.ticks = 0;
-		DamageContainer.distance = 0;
-
-
-		if (mode.getInput() == DamageContainer.MODE) {
-			DamageContainer.dmgTicks = 0;
-		}
-		/*MoonLight Code End*/
-
 	}
 
 	public void onDisable() {
-		DamageContainer.velo = false;
-		DamageContainer.ticksSinceVelocity = 0;
-		/*disabled();*/
+		disabled();
 	}
 
     /*public boolean onChat(String chatMessage) {
@@ -233,41 +204,35 @@ public class LongJump extends Module {
 
 		if (enabled) {
 			if (!Utils.isMoving()) notMoving = true;
-
-
-			if (mode.getInput() == DamageContainer.MODE) {
-				if (DamageContainer.velo)
-					DamageContainer.ticksSinceVelocity++;
-
-			} else {
-				if (boostSetting.getInput() == 0 && verticalMotion.getInput() == 0) {
-					Utils.print("&cValues are set to 0!");
-					disabled();
-					return;
-				}
-
-				int fireballSlot = setupFireballSlot(true);
-				if (fireballSlot != -1) {
-					if (!manual.isToggled()) {
-						lastSlot = spoofSlot = mc.thePlayer.inventory.currentItem;
-						if (mc.thePlayer.inventory.currentItem != fireballSlot) {
-							mc.thePlayer.inventory.currentItem = fireballSlot;
-							swapped = true;
-						}
-
-					}
-					//("Set fireball slot");
-					rotateTick = 1;
-					if (stopMovement.isToggled()) {
-						stopTime = 1;
-					}
-				} // auto disables if -1
-				enabled = false;
+			if (boostSetting.getInput() == 0 && verticalMotion.getInput() == 0) {
+				Utils.print("&cValues are set to 0!");
+				disabled();
+				return;
 			}
+			int fireballSlot = setupFireballSlot(true);
+			if (fireballSlot != -1) {
+				if (!manual.isToggled()) {
+					lastSlot = spoofSlot = mc.thePlayer.inventory.currentItem;
+					if (mc.thePlayer.inventory.currentItem != fireballSlot) {
+						mc.thePlayer.inventory.currentItem = fireballSlot;
+						swapped = true;
+					}
 
-
+				}
+				//("Set fireball slot");
+				rotateTick = 1;
+				if (stopMovement.isToggled()) {
+					stopTime = 1;
+				}
+			} // auto disables if -1
+			enabled = false;
 		}
 
+		if (notMoving) {
+			motionDecayVal = 21;
+		} else {
+			motionDecayVal = (int) motionDecay.getInput();
+		}
 		if (stopTime == -1 && ++boostTicks > (!verticalKey() ? 33/*flat motion ticks*/ : (!notMoving ? 32/*normal motion ticks*/ : 33/*vertical motion ticks*/))) {
 			disabled();
 			return;
@@ -312,18 +277,6 @@ public class LongJump extends Module {
 	@SubscribeEvent
 	public void onRenderTick(TickEvent.RenderTickEvent ev) {
 		if (!Utils.nullCheck()) return;
-		/*MoonLight Code Begin*/
-		if (mode.getInput() == DamageContainer.MODE) {
-			double distance = Math.round(DamageContainer.distance * 100.0) / 100.0;
-			String fullText = distance + " blocks";
-			ScaledResolution sr = new ScaledResolution(mc);
-			int xPos = (sr.getScaledWidth() - mc.fontRendererObj.getStringWidth(fullText)) / 2;
-			int yPos = sr.getScaledHeight() / 2 + 8;
-			mc.fontRendererObj.drawStringWithShadow(fullText, xPos, yPos, color);
-			return;
-		}
-		/*MoonLight Code End*/
-
 		if (mc.currentScreen != null || !renderFloatProgress.isToggled() || mode.getInput() != 0 || !function) return;
 
 		// 更新动画计时（333ms间隔）
@@ -400,10 +353,10 @@ public class LongJump extends Module {
 
 		// 绘制圆角矩形
 		glBegin(GL_POLYGON);
-		for (int i = 0; i <= 360; i += 30) {
+		for(int i = 0; i <= 360; i += 30) {
 			float rad = (float) Math.toRadians(i);
-			float cx = x + radius + (float) Math.cos(rad) * radius;
-			float cy = y + radius + (float) Math.sin(rad) * radius;
+			float cx = x + radius + (float)Math.cos(rad) * radius;
+			float cy = y + radius + (float)Math.sin(rad) * radius;
 			glVertex2f(cx, cy);
 		}
 		glEnd();
@@ -461,71 +414,6 @@ public class LongJump extends Module {
 		if (!Utils.nullCheck()) {
 			return;
 		}
-
-
-		if (mode.getInput() == DamageContainer.MODE) {
-			++DamageContainer.dmgTicks;
-			if (DamageContainer.dmgTicks < 44 && DamageContainer.dmgTicks % 2 == 0) {
-				e.setPosX(e.getPosX() - (double) handleX() * 0.09D);
-				e.setPosZ(e.getPosZ() - (double) handleZ() * 0.09D);
-			}
-
-			if (DamageContainer.dmgTicks == 1) {
-				e.setPosY(e.getPosY() + 0.034939999302625656D);
-				e.setOnGround(false);
-			} else if (DamageContainer.dmgTicks < 45) {
-				e.setPosY(e.getPosY() + (DamageContainer.dmgTicks % 2 != 0 ? 0.1449999064207077D : Math.random() / 5000.0D));
-				e.setOnGround(false);
-				if (DamageContainer.dmgTicks == 44) {
-					Utils.strafe((0.2830 + Utils.getSpeedAmplifier() * 0.2) - 0.005);
-					mc.thePlayer.jump();
-				}
-			} else if (DamageContainer.dmgTicks == 45) {
-				((IAccessorMinecraft) mc).getTimer().timerSpeed = 0.6f;
-				e.setPosY(e.getPosY() + 1.0E-5D);
-				mc.getNetHandler().addToSendQueue(new C03PacketPlayer(true));
-
-			} else if (DamageContainer.dmgTicks == 47) {
-				((IAccessorMinecraft) mc).getTimer().timerSpeed = 1;
-			}
-
-			if (DamageContainer.ticksSinceVelocity > 3 && DamageContainer.ticksSinceVelocity < 38 || DamageContainer.ticksSinceVelocity > 37 && mc.thePlayer.motionY <= 0.0D) {
-				mc.thePlayer.motionY += 0.02830D;
-			}
-
-			switch (DamageContainer.ticksSinceVelocity) {
-				case 1:
-					mc.thePlayer.motionX *= 2.1;
-					mc.thePlayer.motionZ *= 2.1;
-				case 2:
-				case 3:
-				case 4:
-				case 5:
-				case 8:
-				case 9:
-				case 10:
-				case 11:
-				default:
-					break;
-				case 6:
-					mc.thePlayer.motionY = 0.02999D;
-					break;
-				case 7:
-					mc.thePlayer.motionY = 0.02995D;
-					break;
-				case 12:
-					mc.thePlayer.motionY = 0.0D;
-					break;
-				case 13:
-					mc.thePlayer.motionY += 0.00999D;
-			}
-
-			if (DamageContainer.velo && mc.thePlayer.onGround)
-				toggle();
-			return;
-		}
-
-
 		if (rotateTick >= 3) {
 			rotateTick = 0;
 		}
@@ -552,7 +440,8 @@ public class LongJump extends Module {
 					mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
 					if (silentSwing.isToggled()) {
 						mc.thePlayer.sendQueue.addToSendQueue(new C0APacketAnimation());
-					} else {
+					}
+					else {
 						mc.thePlayer.swingItem();
 						if (!spoofItem.isToggled()) {
 							mc.getItemRenderer().resetEquippedProgress();
@@ -627,18 +516,7 @@ public class LongJump extends Module {
 		} else if (packet instanceof S08PacketPlayerPosLook) {
 			Utils.print("&cReceived setback, disabling.");
 			disabled();
-		}/*MoonLight Code Begin*/ else if (packet instanceof S12PacketEntityVelocity) {
-			S12PacketEntityVelocity velocityPacket = (S12PacketEntityVelocity) packet;
-			if (velocityPacket.getEntityID() != mc.thePlayer.getEntityId() || e.isCanceled()) return;
-			double x = (double) velocityPacket.getMotionX() / 8000.0D;
-			double z = (double) velocityPacket.getMotionZ() / 8000.0D;
-			double speed = Math.hypot(x, z);
-			Utils.strafe(MathHelper.clamp_double(speed, 0.44D, 0.48D));
-			mc.thePlayer.motionY = (double) velocityPacket.getMotionY() / 8000.0D;
-			DamageContainer.ticksSinceVelocity = 0;
-			e.setCanceled(true);
-			DamageContainer.velo = true;
-		}/*MoonLight Code End*/
+		}
 
 		if (hideExplosion.isToggled() && fireballTime != 0 && (packet instanceof S0EPacketSpawnObject || packet instanceof S2APacketParticles || packet instanceof S29PacketSoundEffect)) {
 			e.setCanceled(true);
@@ -656,7 +534,6 @@ public class LongJump extends Module {
 		}
 		return n;
 	}
-
 	public static void drawRect(float x, float y, float x2, float y2, int color) {
 		float var5;
 		if (x < x2) {
@@ -783,11 +660,87 @@ public class LongJump extends Module {
 		return beginFlat.isToggled() ? verticalKey.isPressed() : !flatKey.isPressed();
 	}
 
-	private static float handleX() {
-		return (float) (-Math.sin(Math.toRadians((float) mc.thePlayer.motionX)));
-	}
-
-	private static float handleZ() {
-		return (float) Math.cos(Math.toRadians((float) mc.thePlayer.motionZ));
+	private int getKeyCode(String keyName) {
+		switch (keyName) {
+			case "0": return 11;
+			case "1": return 2;
+			case "2": return 3;
+			case "3": return 4;
+			case "4": return 5;
+			case "5": return 6;
+			case "6": return 7;
+			case "7": return 8;
+			case "8": return 9;
+			case "9": return 10;
+			case "A": return 30;
+			case "B": return 48;
+			case "C": return 46;
+			case "D": return 32;
+			case "E": return 18;
+			case "F": return 33;
+			case "G": return 34;
+			case "H": return 35;
+			case "I": return 23;
+			case "J": return 36;
+			case "K": return 37;
+			case "L": return 38;
+			case "M": return 50;
+			case "N": return 49;
+			case "O": return 24;
+			case "P": return 25;
+			case "Q": return 16;
+			case "R": return 19;
+			case "S": return 31;
+			case "T": return 20;
+			case "U": return 22;
+			case "V": return 47;
+			case "W": return 17;
+			case "X": return 45;
+			case "Y": return 21;
+			case "Z": return 44;
+			case "BACK": return 14;
+			case "CAPITAL": return 58;
+			case "COMMA": return 51;
+			case "DELETE": return 211;
+			case "DOWN": return 208;
+			case "END": return 207;
+			case "ESCAPE": return 1;
+			case "F1": return 59;
+			case "F2": return 60;
+			case "F3": return 61;
+			case "F4": return 62;
+			case "F5": return 63;
+			case "F6": return 64;
+			case "F7": return 65;
+			case "HOME": return 199;
+			case "INSERT": return 210;
+			case "LBRACKET": return 26;
+			case "LCONTROL": return 29;
+			case "LMENU": return 56;
+			case "LMETA": return 219;
+			case "LSHIFT": return 42;
+			case "MINUS": return 12;
+			case "NUMPAD0": return 82;
+			case "NUMPAD1": return 79;
+			case "NUMPAD2": return 80;
+			case "NUMPAD3": return 81;
+			case "NUMPAD4": return 75;
+			case "NUMPAD5": return 76;
+			case "NUMPAD6": return 77;
+			case "NUMPAD7": return 71;
+			case "NUMPAD8": return 72;
+			case "NUMPAD9": return 73;
+			case "PERIOD": return 52;
+			case "RETURN": return 28;
+			case "RCONTROL": return 157;
+			case "RSHIFT": return 54;
+			case "RBRACKET": return 27;
+			case "SEMICOLON": return 39;
+			case "SLASH": return 53;
+			case "SPACE": return 57;
+			case "TAB": return 15;
+			case "GRAVE": return 41;
+			default: return -1;
+		}
 	}
 }
