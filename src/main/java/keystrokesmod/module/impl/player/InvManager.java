@@ -119,7 +119,6 @@ public class InvManager extends Module {
         return !isHandlingChest
                 && closeInventory.isToggled()
                 && (Utils.inInventory() || simulatedInventoryOpen)
-                && !(mc.thePlayer.openContainer instanceof ContainerChest)
                 && (lastClean >= inventoryCleanerDelay.getInput() || lastClean == 0)
                 && (lastArmor >= autoArmor.getInput() || lastArmor == 0)
                 && (lastSort >= autoSort.getInput() || lastSort == 0);
@@ -141,23 +140,10 @@ public class InvManager extends Module {
             return;
         }
 
-        boolean isChestOpen = mc.thePlayer.openContainer instanceof ContainerChest;
-        if (isChestOpen) {
-            isHandlingChest = true;
-            simulatedInventoryOpen = false;
-        } else {
-            isHandlingChest = false;
-        }
-
         if (tempDisableCloseGUI && System.currentTimeMillis() - chestCloseTime >= 140) {
             tempDisableCloseGUI = false;
         }
-        simulatedInventoryOpen = !tempDisableCloseGUI
-                && enableWithoutGUI.isToggled()
-                && checkInvMoveCloseMode()
-                && !isHandlingChest
-                && !isChestOpen;
-
+        simulatedInventoryOpen = !tempDisableCloseGUI && enableWithoutGUI.isToggled() && checkInvMoveCloseMode() && !isHandlingChest;
         if (simulatedInventoryOpen && !Utils.inInventory()) {
             mc.thePlayer.sendQueue.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
         }
@@ -245,9 +231,6 @@ public class InvManager extends Module {
         }
         else if (chestStealer.getInput() != -1 && mc.thePlayer.openContainer instanceof ContainerChest) {
             ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
-
-            if (System.currentTimeMillis() - chestCloseTime < 100) return;
-
             if (chest == null || inventoryFull()) {
                 autoClose(chest);
                 return;
@@ -473,15 +456,12 @@ public class InvManager extends Module {
     private void autoClose(ContainerChest chest) {
         if (closeChest.isToggled() && receivedInventoryData) {
             if (simulatedInventoryOpen) return;
-            if (!(mc.thePlayer.openContainer instanceof ContainerChest)) return;
-
             if (chest != null) {
                 String name = Utils.stripColor(chest.getLowerChestInventory().getName());
                 if (!customChest.isToggled() && !name.equals("Chest") && !name.equals("Ender Chest") && !name.equals("Large Chest")) {
                     return;
                 }
             }
-            if (System.currentTimeMillis() - chestCloseTime < 200) return;
             tempDisableCloseGUI = true;
             chestCloseTime = System.currentTimeMillis();
             mc.thePlayer.closeScreen();
