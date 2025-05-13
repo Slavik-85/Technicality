@@ -108,7 +108,7 @@ public class InvManager extends Module {
     private boolean checkInvMoveCloseMode() {
         Module invMove = ModuleManager.getModule(InvMove.class);
         if (invMove != null && invMove.isEnabled()) {
-            return ((InvMove) invMove).inventory.getInput() == 3; // close模式对应索引3
+            return ((InvMove) invMove).inventory.getInput() == 3;
         }
         return false;
     }
