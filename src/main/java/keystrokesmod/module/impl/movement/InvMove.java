@@ -197,6 +197,7 @@ public class InvMove extends Module {
     }
 
     private boolean canBlink() {
+        if (ModuleManager.invManager.simulatedInventoryOpen) return true;
         if (mc.currentScreen == null && inventory.getInput() != 3) {
             return false;
         }
@@ -211,6 +212,10 @@ public class InvMove extends Module {
 
     private void releasePackets() {
         synchronized (blinkedPackets) {
+            if (ModuleManager.invManager.simulatedInventoryOpen) {
+                blinkedPackets.add(new C0DPacketCloseWindow(mc.thePlayer.inventoryContainer.windowId));
+            }
+
             for (Packet packet : blinkedPackets) {
                 PacketUtils.sendPacketNoEvent(packet);
             }

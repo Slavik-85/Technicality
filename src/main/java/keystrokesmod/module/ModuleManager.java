@@ -206,7 +206,7 @@ public class ModuleManager {
         return null;
     }
 
-    public Module getModule(Class clazz) {
+    public static Module getModule(Class clazz) {
         for (Module module : modules) {
             if (module.getClass().equals(clazz)) {
                 return module;

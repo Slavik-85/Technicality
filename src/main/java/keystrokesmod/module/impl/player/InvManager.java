@@ -2,6 +2,8 @@ package keystrokesmod.module.impl.player;
 
 import keystrokesmod.event.ReceivePacketEvent;
 import keystrokesmod.module.Module;
+import keystrokesmod.module.ModuleManager;
+import keystrokesmod.module.impl.movement.InvMove;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.GroupSetting;
 import keystrokesmod.module.setting.impl.KeySetting;
@@ -17,6 +19,8 @@ import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.*;
+import net.minecraft.network.play.client.C0DPacketCloseWindow;
+import net.minecraft.network.play.client.C16PacketClientStatus;
 import net.minecraft.network.play.server.S30PacketWindowItems;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
@@ -30,6 +34,7 @@ public class InvManager extends Module {
     private ButtonSetting closeChest;
     private ButtonSetting closeInventory;
     private ButtonSetting disableInLobby;
+    private ButtonSetting enableWithoutGUI;
 
     private SliderSetting autoArmor;
 
@@ -66,6 +71,7 @@ public class InvManager extends Module {
         this.registerSetting(closeChest = new ButtonSetting("Close chest", true));
         this.registerSetting(closeInventory = new ButtonSetting("Close inventory", false));
         this.registerSetting(disableInLobby = new ButtonSetting("Disable in lobby", true));
+        this.registerSetting(enableWithoutGUI = new ButtonSetting("Close GUI", false));
         this.registerSetting(autoArmor = new SliderSetting("Auto armor", true, 3, 0, 20, 1));
         this.registerSetting(autoSort = new SliderSetting("Auto sort", true,3, 0, 20, 1));
         this.registerSetting(chestStealer = new SliderSetting("Chest stealer", true, 2, 0, 20, 1));
@@ -91,9 +97,35 @@ public class InvManager extends Module {
         this.autoSort.setSuffix(" tick");
     }
 
+    public boolean simulatedInventoryOpen;
+
     public void onEnable() {
         resetDelay();
         receivedInventoryData = false;
+    }
+
+    private boolean checkInvMoveCloseMode() {
+        Module invMove = ModuleManager.getModule(InvMove.class);
+        if (invMove != null && invMove.isEnabled()) {
+            return ((InvMove) invMove).inventory.getInput() == 3; // close模式对应索引3
+        }
+        return false;
+    }
+
+    private boolean shouldCloseInventory() {
+        return closeInventory.isToggled()
+                && (lastClean >= inventoryCleanerDelay.getInput() || lastClean == 0)
+                && (lastArmor >= autoArmor.getInput() || lastArmor == 0)
+                && (lastSort >= autoSort.getInput() || lastSort == 0);
+    }
+    private void executeInventoryClose() {
+        if (Utils.inInventory()) {
+            mc.thePlayer.closeScreen();
+        }
+        else if (simulatedInventoryOpen) {
+            mc.getNetHandler().addToSendQueue(new C0DPacketCloseWindow(mc.thePlayer.inventoryContainer.windowId));
+            receivedInventoryData = false;
+        }
     }
 
     public void onUpdate() {
@@ -101,7 +133,12 @@ public class InvManager extends Module {
             resetDelay();
             return;
         }
-        if (Utils.inInventory()) {
+
+        simulatedInventoryOpen = enableWithoutGUI.isToggled() && checkInvMoveCloseMode();
+        if (simulatedInventoryOpen && !Utils.inInventory()) {
+            mc.thePlayer.sendQueue.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
+        }
+        if (Utils.inInventory() || simulatedInventoryOpen) {
             if (autoArmor.getInput() != -1 && lastArmor++ >= autoArmor.getInput()) {
                 for (int i = 0; i < 4; i++) {
                     int bestSlot = getBestArmor(i, null);
@@ -176,10 +213,8 @@ public class InvManager extends Module {
                     }
                 }
             }
-            if ((lastClean > inventoryCleanerDelay.getInput() || lastClean == 0) && (lastArmor > autoArmor.getInput() || lastArmor == 0) && (lastSort > autoSort.getInput() || lastSort == 0)) {
-                if (closeInventory.isToggled()) {
-                    mc.thePlayer.closeScreen();
-                }
+            if (shouldCloseInventory()) {
+                executeInventoryClose();
             }
         }
         else if (chestStealer.getInput() != -1 && mc.thePlayer.openContainer instanceof ContainerChest) {
@@ -402,10 +437,12 @@ public class InvManager extends Module {
 
     private void resetDelay() {
         lastStole = lastArmor = lastClean = lastSort = 0;
+        simulatedInventoryOpen = false;
     }
 
     private void autoClose(ContainerChest chest) {
         if (closeChest.isToggled() && receivedInventoryData) {
+            if (simulatedInventoryOpen) return;
             if (chest != null) {
                 String name = Utils.stripColor(chest.getLowerChestInventory().getName());
                 if (!customChest.isToggled() && !name.equals("Chest") && !name.equals("Ender Chest") && !name.equals("Large Chest")) {
