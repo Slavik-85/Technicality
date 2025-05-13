@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class InvManager extends Module {
+    private boolean isHandlingChest;
     private ButtonSetting closeChest;
     private ButtonSetting closeInventory;
     private ButtonSetting disableInLobby;
@@ -113,7 +114,8 @@ public class InvManager extends Module {
     }
 
     private boolean shouldCloseInventory() {
-        return closeInventory.isToggled()
+        return !isHandlingChest
+                && closeInventory.isToggled()
                 && (lastClean >= inventoryCleanerDelay.getInput() || lastClean == 0)
                 && (lastArmor >= autoArmor.getInput() || lastArmor == 0)
                 && (lastSort >= autoSort.getInput() || lastSort == 0);
@@ -134,9 +136,12 @@ public class InvManager extends Module {
             return;
         }
 
-        simulatedInventoryOpen = enableWithoutGUI.isToggled() && checkInvMoveCloseMode();
+        simulatedInventoryOpen = enableWithoutGUI.isToggled() && checkInvMoveCloseMode() && !isHandlingChest;
         if (simulatedInventoryOpen && !Utils.inInventory()) {
             mc.thePlayer.sendQueue.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
+        }
+        if (chestStealer.getInput() != -1 && mc.thePlayer.openContainer instanceof ContainerChest) {
+            isHandlingChest = true;
         }
         if (Utils.inInventory() || simulatedInventoryOpen) {
             if (autoArmor.getInput() != -1 && lastArmor++ >= autoArmor.getInput()) {
@@ -377,6 +382,7 @@ public class InvManager extends Module {
             }
         }
         else {
+            isHandlingChest = false;
             resetDelay();
             receivedInventoryData = false;
         }
@@ -451,6 +457,7 @@ public class InvManager extends Module {
             }
             mc.thePlayer.closeScreen();
             receivedInventoryData = false;
+            isHandlingChest = false;
         }
     }
 

@@ -201,7 +201,7 @@ public class HUD extends Module {
         }
 
         if (showWatermark.isToggled()) {
-            String text = lowercase.isToggled() ? "Raven bS+" : "raven bS+";
+            String text = lowercase.isToggled() ? "Raven P+" : "raven p+";
             int[] displaySize = new int[]{mc.displayWidth, mc.displayHeight};
             float textHeight = mc.fontRendererObj.FONT_HEIGHT;
             float x = 6;
