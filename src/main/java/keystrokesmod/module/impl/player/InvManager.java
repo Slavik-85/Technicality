@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class InvManager extends Module {
+    private boolean chestRecentlyClosed = false;
     private long chestCloseTime = 0;
     private boolean tempDisableCloseGUI = false;
     private boolean isHandlingChest;
@@ -118,11 +119,12 @@ public class InvManager extends Module {
     private boolean shouldCloseInventory() {
         return !isHandlingChest
                 && closeInventory.isToggled()
+                && !chestRecentlyClosed
                 && (Utils.inInventory() || simulatedInventoryOpen)
                 && (lastClean >= inventoryCleanerDelay.getInput() || lastClean == 0)
                 && (lastArmor >= autoArmor.getInput() || lastArmor == 0)
                 && (lastSort >= autoSort.getInput() || lastSort == 0)
-                && !(mc.thePlayer.openContainer instanceof ContainerChest);
+                && (simulatedInventoryOpen || !(mc.thePlayer.openContainer instanceof ContainerChest));
     }
 
     private void executeInventoryClose() {
@@ -141,16 +143,41 @@ public class InvManager extends Module {
             return;
         }
 
-        if (tempDisableCloseGUI && System.currentTimeMillis() - chestCloseTime >= 140) {
-            tempDisableCloseGUI = false;
+        boolean wasHandlingChest = isHandlingChest;
+        isHandlingChest = (mc.thePlayer.openContainer instanceof ContainerChest);
+
+        if (!wasHandlingChest && isHandlingChest) {
+            closeInventory.setToggled(false);
+
+            if (wasHandlingChest && !isHandlingChest) {
+                chestCloseTime = System.currentTimeMillis();
+                chestRecentlyClosed = true;
+                tempDisableCloseGUI = true;
+            }
+
+            if (tempDisableCloseGUI && System.currentTimeMillis() - chestCloseTime >= 140) {
+                tempDisableCloseGUI = false;
+            }
+
+            simulatedInventoryOpen = !tempDisableCloseGUI
+                    && enableWithoutGUI.isToggled()
+                    && checkInvMoveCloseMode()
+                    && !isHandlingChest;
+
+            if (simulatedInventoryOpen && !Utils.inInventory()) {
+                mc.thePlayer.sendQueue.addToSendQueue(
+                        new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT)
+                );
+            }
+            if (chestRecentlyClosed && System.currentTimeMillis() - chestCloseTime > 200) {
+                chestRecentlyClosed = false;
+                closeInventory.setToggled(true);
+            }
         }
-        simulatedInventoryOpen = !tempDisableCloseGUI && enableWithoutGUI.isToggled() && checkInvMoveCloseMode() && !isHandlingChest;
-        if (simulatedInventoryOpen && !Utils.inInventory()) {
-            mc.thePlayer.sendQueue.addToSendQueue(new C16PacketClientStatus(C16PacketClientStatus.EnumState.OPEN_INVENTORY_ACHIEVEMENT));
+                if (isHandlingChest) {
+            closeInventory.setToggled(false);
         }
-        if (chestStealer.getInput() != -1 && mc.thePlayer.openContainer instanceof ContainerChest) {
-            isHandlingChest = true;
-        }
+
         if (Utils.inInventory() || simulatedInventoryOpen) {
             if (autoArmor.getInput() != -1 && lastArmor++ >= autoArmor.getInput()) {
                 for (int i = 0; i < 4; i++) {
@@ -229,8 +256,8 @@ public class InvManager extends Module {
             if (shouldCloseInventory()) {
                 executeInventoryClose();
             }
-        }
-        else if (chestStealer.getInput() != -1 && mc.thePlayer.openContainer instanceof ContainerChest) {
+        } else if (chestStealer.getInput() != -1 && mc.thePlayer.openContainer instanceof ContainerChest) {
+            closeInventory.setToggled(false);
             ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
             if (chest == null || inventoryFull()) {
                 autoClose(chest);
@@ -260,15 +287,13 @@ public class InvManager extends Module {
                     if (++lastStole >= chestStealer.getInput()) {
                         if (swordSlot.getInput() != -1) {
                             mc.playerController.windowClick(chest.windowId, i, (int) swordSlot.getInput() - 1, 2, mc.thePlayer);
-                        }
-                        else {
+                        } else {
                             mc.playerController.windowClick(chest.windowId, i, 0, 1, mc.thePlayer);
                         }
                         lastStole = 0;
                     }
                     stolen = true;
-                }
-                else if (item.getItem() instanceof ItemBlock) {
+                } else if (item.getItem() instanceof ItemBlock) {
                     if (!Utils.canBePlaced((ItemBlock) item.getItem())) {
                         continue;
                     }
@@ -277,44 +302,37 @@ public class InvManager extends Module {
                         lastStole = 0;
                     }
                     stolen = true;
-                }
-                else if (item.getItem() instanceof ItemAppleGold) {
+                } else if (item.getItem() instanceof ItemAppleGold) {
                     if (++lastStole >= chestStealer.getInput()) {
                         if (goldenAppleSlot.getInput() == -1) {
                             mc.playerController.windowClick(chest.windowId, i, 0, 1, mc.thePlayer);
-                        }
-                        else {
+                        } else {
                             mc.playerController.windowClick(chest.windowId, i, (int) (goldenAppleSlot.getInput() - 1), 2, mc.thePlayer);
                         }
                         lastStole = 0;
                     }
                     stolen = true;
-                }
-                else if (item.getItem() instanceof ItemSnowball || item.getItem() instanceof ItemEgg) {
+                } else if (item.getItem() instanceof ItemSnowball || item.getItem() instanceof ItemEgg) {
                     if (++lastStole >= chestStealer.getInput()) {
                         if (projectileSlot.getInput() == -1) {
                             mc.playerController.windowClick(chest.windowId, i, 0, 1, mc.thePlayer);
-                        }
-                        else {
+                        } else {
                             mc.playerController.windowClick(chest.windowId, i, (int) (projectileSlot.getInput() - 1), 2, mc.thePlayer);
                         }
                         lastStole = 0;
                     }
                     stolen = true;
-                }
-                else if (item.getItem() instanceof ItemEnderPearl) {
+                } else if (item.getItem() instanceof ItemEnderPearl) {
                     if (++lastStole >= chestStealer.getInput()) {
                         if (pearlSlot.getInput() == -1) {
                             mc.playerController.windowClick(chest.windowId, i, 0, 1, mc.thePlayer);
-                        }
-                        else {
+                        } else {
                             mc.playerController.windowClick(chest.windowId, i, (int) (pearlSlot.getInput() - 1), 2, mc.thePlayer);
                         }
                         lastStole = 0;
                     }
                     stolen = true;
-                }
-                else if (item.getItem() instanceof ItemArmor) {
+                } else if (item.getItem() instanceof ItemArmor) {
                     if (getBestArmor(((ItemArmor) item.getItem()).armorType, inventory) != i) {
                         continue;
                     }
@@ -323,24 +341,21 @@ public class InvManager extends Module {
                         lastStole = 0;
                     }
                     stolen = true;
-                }
-                else if (item.getItem() instanceof ItemPotion) {
+                } else if (item.getItem() instanceof ItemPotion) {
                     if (++lastStole >= chestStealer.getInput()) {
                         if (!isSpeedPot(item)) {
                             mc.playerController.windowClick(chest.windowId, i, 0, 1, mc.thePlayer);
                         } else {
                             if (getBestPotion((int) speedPotionSlot.getInput(), inventory) != i || speedPotionSlot.getInput() == -1) {
                                 mc.playerController.windowClick(chest.windowId, i, 0, 1, mc.thePlayer);
-                            }
-                            else {
+                            } else {
                                 mc.playerController.windowClick(chest.windowId, i, (int) (speedPotionSlot.getInput() - 1), 2, mc.thePlayer);
                             }
                         }
                         lastStole = 0;
                     }
                     stolen = true;
-                }
-                else if (item.getItem() instanceof ItemTool) {
+                } else if (item.getItem() instanceof ItemTool) {
                     if (++lastStole >= chestStealer.getInput()) {
                         if (getBestTool(item, inventory) != i) {
                             continue;
@@ -351,8 +366,7 @@ public class InvManager extends Module {
                         }
                     }
                     stolen = true;
-                }
-                else if (item.getItem() instanceof ItemBow) {
+                } else if (item.getItem() instanceof ItemBow) {
                     if (++lastStole >= chestStealer.getInput()) {
                         if (getBestBow(inventory) != i) {
                             continue;
@@ -363,8 +377,7 @@ public class InvManager extends Module {
                         }
                     }
                     stolen = true;
-                }
-                else if (item.getItem() instanceof ItemFishingRod) {
+                } else if (item.getItem() instanceof ItemFishingRod) {
                     if (++lastStole >= chestStealer.getInput()) {
                         if (getBestRod(inventory) != i) {
                             continue;
@@ -375,8 +388,7 @@ public class InvManager extends Module {
                         }
                     }
                     stolen = true;
-                }
-                else {
+                } else {
                     if (++lastStole >= chestStealer.getInput()) {
                         mc.playerController.windowClick(chest.windowId, i, 0, 1, mc.thePlayer);
                         lastStole = 0;
@@ -388,9 +400,10 @@ public class InvManager extends Module {
             if (inventoryFull() || !notEmpty || !stolen) {
                 autoClose(null);
             }
-        }
-        else {
-            isHandlingChest = false;
+        } else {
+            if (mc.thePlayer.openContainer == null) {
+                isHandlingChest = false;
+            }
             resetDelay();
             receivedInventoryData = false;
         }
@@ -467,7 +480,6 @@ public class InvManager extends Module {
             chestCloseTime = System.currentTimeMillis();
             mc.thePlayer.closeScreen();
             receivedInventoryData = false;
-            isHandlingChest = false;
         }
     }
 
