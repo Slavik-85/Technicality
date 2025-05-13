@@ -123,12 +123,8 @@ public class InvManager extends Module {
                 && (Utils.inInventory() || simulatedInventoryOpen)
                 && (lastClean >= inventoryCleanerDelay.getInput() || lastClean == 0)
                 && (lastArmor >= autoArmor.getInput() || lastArmor == 0)
-<<<<<<< HEAD
                 && (lastSort >= autoSort.getInput() || lastSort == 0)
                 && (simulatedInventoryOpen || !(mc.thePlayer.openContainer instanceof ContainerChest));
-=======
-                && (lastSort >= autoSort.getInput() || lastSort == 0);
->>>>>>> parent of 8b5d2d5 (！)
     }
 
     private void executeInventoryClose() {
