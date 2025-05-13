@@ -17,7 +17,7 @@ public class MixinGuiIngameForge {
         if (ModuleManager.antiDebuff != null && ModuleManager.antiDebuff.canRemoveNausea(potion)) {
             return false;
         }
-        //12312312
+
         return Minecraft.getMinecraft().thePlayer.isPotionActive(potion);
     }
 
