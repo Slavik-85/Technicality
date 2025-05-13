@@ -61,7 +61,7 @@ public class InvManager extends Module {
     private SliderSetting speedPotionSlot;
     private SliderSetting pearlSlot;
 
-    private String[] trashItems = { "stick", "bed", "sapling", "pressureplate", "weightedplate", "book", "glassbottle", "reeds", "sugar", "expbottle", "flesh", "string", "cake", "mushroom", "flint", "compass", "dyePowder", "feather", "shears", "anvil", "torch", "seeds", "leather", "skull", "record", "flower", "minecart", "waterlily", "wheat", "sulphur", "boat", "dyepowder", "frame", "writingbook", "comparator", "banner", "diode", "item.redstone", "ghasttear", "goldnugget", "netherstalkseeds" };
+    private String[] trashItems = {"stick", "bed", "sapling", "pressureplate", "weightedplate", "book", "glassbottle", "reeds", "sugar", "expbottle", "flesh", "string", "cake", "mushroom", "flint", "compass", "dyePowder", "feather", "shears", "anvil", "torch", "seeds", "leather", "skull", "record", "flower", "minecart", "waterlily", "wheat", "sulphur", "boat", "dyepowder", "frame", "writingbook", "comparator", "banner", "diode", "item.redstone", "ghasttear", "goldnugget", "netherstalkseeds"};
 
     private int lastStole;
     private int lastSort;
@@ -76,7 +76,7 @@ public class InvManager extends Module {
         this.registerSetting(disableInLobby = new ButtonSetting("Disable in lobby", true));
         this.registerSetting(enableWithoutGUI = new ButtonSetting("Close GUI", false));
         this.registerSetting(autoArmor = new SliderSetting("Auto armor", true, 3, 0, 20, 1));
-        this.registerSetting(autoSort = new SliderSetting("Auto sort", true,3, 0, 20, 1));
+        this.registerSetting(autoSort = new SliderSetting("Auto sort", true, 3, 0, 20, 1));
         this.registerSetting(chestStealer = new SliderSetting("Chest stealer", true, 2, 0, 20, 1));
         this.registerSetting(customChest = new ButtonSetting("Steal from custom chests", false));
 
@@ -84,16 +84,16 @@ public class InvManager extends Module {
         this.registerSetting(inventoryCleanerEnabled = new ButtonSetting(inventoryCleaner, "Enabled", true));
         this.registerSetting(inventoryCleanerDelay = new SliderSetting(inventoryCleaner, "Delay", " tick", 3, 0, 20, 1));
         this.registerSetting(cleanKey = new KeySetting(inventoryCleaner, "Clean key", 1002));
-        this.registerSetting(cleanBuckets = new ButtonSetting(inventoryCleaner,"Clean buckets", false));
-        this.registerSetting(maxBlockStacks = new SliderSetting(inventoryCleaner,"Max block stacks", 5, 1, 20, 1));
-        this.registerSetting(maxProjectileStacks = new SliderSetting(inventoryCleaner,"Max projectile stacks", 5, 1, 20, 1));
+        this.registerSetting(cleanBuckets = new ButtonSetting(inventoryCleaner, "Clean buckets", false));
+        this.registerSetting(maxBlockStacks = new SliderSetting(inventoryCleaner, "Max block stacks", 5, 1, 20, 1));
+        this.registerSetting(maxProjectileStacks = new SliderSetting(inventoryCleaner, "Max projectile stacks", 5, 1, 20, 1));
 
         this.registerSetting(swordSlot = new SliderSetting("Sword slot", true, -1, 1, 9, 1));
         this.registerSetting(blocksSlot = new SliderSetting("Blocks slot", true, -1, 1, 9, 1));
         this.registerSetting(goldenAppleSlot = new SliderSetting("Golden apple slot", true, -1, 1, 9, 1));
-        this.registerSetting(projectileSlot = new SliderSetting("Projectile slot", true,-1, 1, 9, 1));
-        this.registerSetting(speedPotionSlot = new SliderSetting("Speed potion slot", true,-1, 1, 9, 1));
-        this.registerSetting(pearlSlot = new SliderSetting("Pearl slot", true,-1, 1, 9, 1));
+        this.registerSetting(projectileSlot = new SliderSetting("Projectile slot", true, -1, 1, 9, 1));
+        this.registerSetting(speedPotionSlot = new SliderSetting("Speed potion slot", true, -1, 1, 9, 1));
+        this.registerSetting(pearlSlot = new SliderSetting("Pearl slot", true, -1, 1, 9, 1));
 
         this.chestStealer.setSuffix(" tick");
         this.autoArmor.setSuffix(" tick");
@@ -121,7 +121,8 @@ public class InvManager extends Module {
                 && (Utils.inInventory() || simulatedInventoryOpen)
                 && (lastClean >= inventoryCleanerDelay.getInput() || lastClean == 0)
                 && (lastArmor >= autoArmor.getInput() || lastArmor == 0)
-                && (lastSort >= autoSort.getInput() || lastSort == 0);
+                && (lastSort >= autoSort.getInput() || lastSort == 0)
+                && !(mc.thePlayer.openContainer instanceof ContainerChest);
     }
 
     private void executeInventoryClose() {
