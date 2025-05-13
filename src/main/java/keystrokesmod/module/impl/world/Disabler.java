@@ -45,7 +45,8 @@ public class Disabler extends Module {
     private int color = new Color(0, 187, 255, 255).getRGB();
     private int dotAnimationCounter = 0;
     private long lastDotUpdate;
-    private boolean hasPrintedRunningMessage = false;
+    private boolean hasPrintedRunningMessage = false; // 新增状态变量
+
     private float barWidth = 80;
     private float barHeight = 5;
     private float filledWidth;
