@@ -45,6 +45,9 @@ import static net.minecraft.util.EnumFacing.DOWN;
 
 
 public class KillAura extends Module {
+    private boolean handleHP2;
+    private int cycleCount1, cycleCount2;
+    private boolean firstCycle = true;
     private SliderSetting aps;
     public SliderSetting autoBlockMode;
     private SliderSetting fov;
@@ -70,7 +73,7 @@ public class KillAura extends Module {
     private ButtonSetting silentSwing;
     private ButtonSetting weaponOnly;
 
-    private String[] autoBlockModes = new String[] { "Manual", "Vanilla", "Partial", "Blink", "Swap" };
+    private String[] autoBlockModes = new String[] { "Manual", "Vanilla", "Fake", "Partial", "Blink", "Swap", "Prediction" };
     private String[] rotationModes = new String[] { "Switch", "Lock view", "None" };
     private String[] rotateModes = new String[] { "Attack", "Swing" };
     private String[] sortModes = new String[] { "Distance", "Health", "Hurttime", "Yaw" };
@@ -89,7 +92,6 @@ public class KillAura extends Module {
     public boolean blockingClient;
     public boolean blockingServer;
     private int interactTicks;
-    private boolean firstCycle;
     private boolean partialDown;
     private int partialTicks;
     private boolean wasUsing;
@@ -206,12 +208,31 @@ public class KillAura extends Module {
         targeting = false;
         wasUsing = mc.gameSettings.keyBindUseItem.isKeyDown();
 
+        double distanceToBB = 0;
+        boolean inBlockRange = false;
+
+        if (target != null) {
+            distanceToBB = getDistanceToBoundingBox(target);
+            inBlockRange = distanceToBB <= blockRange.getInput();
+        }
+
         if (autoBlockMode.getInput() != 4) {
             if (target == null || !manualBlock() && manualBlock.isToggled()) {
+                if (target != null) {
+                    distanceToBB = getDistanceToBoundingBox(target);
+                    inBlockRange = distanceToBB <= blockRange.getInput();
+                    handleHP2 = (autoBlockMode.getInput() == 5 && inBlockRange);
+                }
+
                 if (ModuleUtils.swapTick == 0 && !ModuleUtils.isBlocked) {
                     interactTicks = 1;
                 } else {
                     interactTicks = 0;
+                }
+
+                if (autoBlockMode.getInput() == 5 && inBlockRange) { // Prediction
+                    handleHP2 = true;
+                    handleAutoBlockPost(distanceToBB);
                 }
             }
         }
@@ -271,8 +292,7 @@ public class KillAura extends Module {
             handleBlocking(false);
             return;
         }
-        double distanceToBB = getDistanceToBoundingBox(target);
-        boolean inBlockRange = distanceToBB <= blockRange.getInput();
+
         if (!autoBlockOverride() || !inBlockRange || (!manualBlock() && manualBlock.isToggled())) { // regular swing & attack if autoblock isnt overriding or isnt in autoblock range
             handleSwingAndAttack(distanceToBB, false);
             if (blinking.get() || lag) {
@@ -821,11 +841,10 @@ public class KillAura extends Module {
                 setKeyBindState(keyCode, blockState, false);
                 this.blockingClient = blockState;
                 break;
-            case 3: // blink
-            case 4: // swap
+            case 2: // Fake
                 ReflectionUtils.setItemInUse(this.blockingClient = blockState);
                 break;
-            case 2: // partial
+            case 3: // partial
                 if (!blockState) {
                     rightClick(partialDown = false);
                     break;
@@ -839,6 +858,12 @@ public class KillAura extends Module {
                 else if (partialTicks == 2) {
                     rightClick(partialDown = true);
                 }
+                break;
+            case 4: // blink
+            case 5: // swap
+                ReflectionUtils.setItemInUse(this.blockingClient = blockState);
+                break;
+            case 6: // Prediction
                 break;
         }
         previousAutoBlockMode = (int) autoBlockMode.getInput();
@@ -862,7 +887,7 @@ public class KillAura extends Module {
     }
 
     public boolean blinkAutoBlock() {
-        return (autoBlockMode.getInput() >= 3);
+        return (autoBlockMode.getInput() >= 4);
     }
 
     private float unwrapYaw(float yaw, float prevYaw) {
@@ -892,7 +917,15 @@ public class KillAura extends Module {
         }
         boolean swung = false;
         switch ((int) autoBlockMode.getInput()) {
-            case 3: // blink
+            case 2:
+                setCurrentSlot();
+                handleInteractAndAttack(distance, true, true, swung);
+                sendBlockPacket();
+                releasePackets(); // release
+                interactTicks = 0;
+                break;
+            case 3: //fake
+            case 4: // blink
                 interactTicks++;
                 switch (interactTicks) {
                     case 1:
@@ -901,16 +934,9 @@ public class KillAura extends Module {
                             setSwapSlot();
                         }
                         break;
-                    case 2:
-                        setCurrentSlot();
-                        handleInteractAndAttack(distance, true, true, swung);
-                        sendBlockPacket();
-                        releasePackets(); // release
-                        interactTicks = 0;
-                        break;
                 }
                 break;
-            case 4: // swap
+            case 5: // swap
                 interactTicks++;
                 if (interactTicks <= 2 && cycle == 0 || interactTicks <= 1 && cycle == 1) {
                     if (ModuleUtils.isBlocked) {
@@ -928,6 +954,36 @@ public class KillAura extends Module {
                     }
                 }
                 break;
+
+            case 6: // prediction
+                interactTicks++;
+                switch (interactTicks) {
+                    case 3:
+                        if (ModuleUtils.isBlocked) {
+                            setSwapSlot();
+                            swapped = true;
+                        }
+                        interactTicks = 4;
+                        break;
+                }
+                break;
+        }
+    }
+
+    private void handleAutoBlockPost(double distance) {
+        boolean inAttackDistance = inRange(target, attackRange.getInput() - 0.005);
+        if (inAttackDistance) {
+            attackingEntity = target;
+        }
+
+        if (interactTicks > 3) {
+            if (swapped) {
+                setCurrentSlot();
+                swapped = false;
+            }
+            handleInteractAndAttack(distance, true, true, false);
+            sendBlockPacket();
+            interactTicks = 0;
         }
     }
 
@@ -985,6 +1041,7 @@ public class KillAura extends Module {
 
     private void sendBlockPacket() {
         mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+        blocked = true;
     }
 
 
@@ -1157,6 +1214,10 @@ public class KillAura extends Module {
     }
 
     public void resetBlinkState(boolean unblock) {
+        if (autoBlockMode.getInput() == 5) {
+            cycleCount1 = cycleCount2 = 0;
+            firstCycle = true;
+        }
         blockingServer = false;
         blinking.set(false);
         releasePackets();

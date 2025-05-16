@@ -1,5 +1,9 @@
 package keystrokesmod.module.impl.combat;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.ReceiveAllPacketsEvent;
 import keystrokesmod.module.Module;
@@ -11,12 +15,14 @@ import keystrokesmod.module.setting.impl.KeySetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.ModuleUtils;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.client.C0FPacketConfirmTransaction;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
 import net.minecraft.network.play.server.S27PacketExplosion;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
 public class Velocity extends Module {
     public SliderSetting velocityModes;
@@ -28,6 +34,9 @@ public class Velocity extends Module {
     public static SliderSetting reverseHorizontal, reverseExplosionsHorizontal, reverseExplosionsVertical;
     // AirMotion模式设置
     public static SliderSetting airMotionHorizontal, airMotionVertical, airExplosionsHorizontal, airExplosionsVertical;
+    // Delay模式设置
+    public static SliderSetting delaySlider;
+    public static ButtonSetting delayReverse;
 
     public static SliderSetting minExtraSpeed, extraSpeedBoost;
     private SliderSetting chance;
@@ -48,7 +57,12 @@ public class Velocity extends Module {
     private ButtonSetting cancelWhileFalling;
     private ButtonSetting cancelOffGround;
 
-    private String[] velocityModesString = new String[]{"Normal", "Hypixel", "Reverse", "AirMotion"};
+    // Delay模式变量
+    private final Map<Object, Integer> delayedPackets = new LinkedHashMap<>();
+    private boolean isDelaying = false;
+    private boolean isReleasing = false;
+
+    private String[] velocityModesString = new String[]{"Normal", "Hypixel", "Reverse", "AirMotion", "Delay"};
 
     public Velocity() {
         super("Velocity", category.combat);
@@ -78,6 +92,11 @@ public class Velocity extends Module {
         this.registerSetting(airExplosionsHorizontal = new SliderSetting("AM EH", 0.0, 0.0, 100.0, 1.0));
         this.registerSetting(airExplosionsVertical = new SliderSetting("AM EV", 0.0, 0.0, 100.0, 1.0));
 
+        // Delay模式设置
+        this.registerSetting(new DescriptionSetting("Delay Settings:"));
+        this.registerSetting(delayReverse = new ButtonSetting("Reverse", false));
+        this.registerSetting(delaySlider = new SliderSetting("Delay Ticks", 5, 1, 40, 1));
+
         // 通用设置
         this.registerSetting(minExtraSpeed = new SliderSetting("Max Boost Speed", 0, 0, 0.7, 0.01));
         this.registerSetting(extraSpeedBoost = new SliderSetting("Boost Multi", "%", 0, 0, 100, 1));
@@ -105,6 +124,7 @@ public class Velocity extends Module {
         boolean isHypixel = mode == 1;
         boolean isReverse = mode == 2;
         boolean isAirMotion = mode == 3;
+        boolean isDelay = mode == 4;
 
         // Normal模式可见性
         horizontal.setVisible(isNormal, this);
@@ -141,6 +161,10 @@ public class Velocity extends Module {
         cancelExplosion.setVisible(isAirMotion, this);
         cancelWhileFalling.setVisible(isAirMotion, this);
         cancelOffGround.setVisible(isAirMotion, this);
+
+        // Delay模式可见性
+        delayReverse.setVisible(isDelay, this);
+        delaySlider.setVisible(isDelay, this);
     }
 
     @SubscribeEvent
@@ -160,11 +184,46 @@ public class Velocity extends Module {
         if (delay > 0 && (Utils.time() - delay) > 100) {
             delay = 0;
         }
+        // Delay模式逻辑
+        if ((int) velocityModes.getInput() == 4) {
+            isReleasing = false;
+            List<Object> toRelease = new ArrayList<>();
+
+            for (Map.Entry<Object, Integer> entry : new ArrayList<>(delayedPackets.entrySet())) {
+                int ticksLeft = entry.getValue() - 1;
+                if (ticksLeft <= 0) {
+                    toRelease.add(entry.getKey());
+                } else {
+                    delayedPackets.put(entry.getKey(), ticksLeft);
+                }
+            }
+
+            for (Object packet : toRelease) {
+                if (packet instanceof S12PacketEntityVelocity) {
+                    S12PacketEntityVelocity s12 = (S12PacketEntityVelocity) packet;
+                    if (delayReverse.isToggled()) {
+                        mc.thePlayer.motionX = -s12.getMotionX() / 8000.0;
+                        mc.thePlayer.motionZ = -s12.getMotionZ() / 8000.0;
+                    } else {
+                        mc.thePlayer.motionX = s12.getMotionX() / 8000.0;
+                        mc.thePlayer.motionZ = s12.getMotionZ() / 8000.0;
+                    }
+                    mc.thePlayer.motionY = s12.getMotionY() / 8000.0;
+                } else if (packet instanceof C03PacketPlayer || packet instanceof C0FPacketConfirmTransaction) {
+                    mc.getNetHandler().addToSendQueue((Packet) packet);
+                }
+                delayedPackets.remove(packet);
+            }
+            isDelaying = !delayedPackets.isEmpty();
+        }
     }
 
     // 修改所有旧版爆炸设置引用
     @SubscribeEvent
     public void onReceivePacketAll(ReceiveAllPacketsEvent e) {
+        if (velocityModes.getInput() == 4) { // Delay模式
+            handleDelayMode(e);
+        }
         if (velocityModes.getInput() == 3) { // AirMotion模式
             handleAirMotion(e);
         } else if (velocityModes.getInput() >= 1) {
@@ -180,6 +239,26 @@ public class Velocity extends Module {
                 handleExplosionPacket(e);
             } else if (e.getPacket() instanceof S12PacketEntityVelocity) {
                 handleVelocityPacket(e);
+            }
+        }
+    }
+
+    private void handleDelayMode(ReceiveAllPacketsEvent e) {
+        if (e.getPacket() instanceof S12PacketEntityVelocity) {
+            S12PacketEntityVelocity s12 = (S12PacketEntityVelocity) e.getPacket();
+            if (s12.getEntityID() == mc.thePlayer.getEntityId()) {
+                if (!delayedPackets.containsKey(s12)) {
+                    delayedPackets.put(s12, (int) delaySlider.getInput());
+                    isDelaying = true;
+                    e.setCanceled(true);
+                }
+            }
+        } else if (e.getPacket() instanceof C03PacketPlayer || e.getPacket() instanceof C0FPacketConfirmTransaction) {
+            if (isDelaying) {
+                if (!delayedPackets.containsKey(e.getPacket())) {
+                    delayedPackets.put(e.getPacket(), (int) delaySlider.getInput());
+                    e.setCanceled(true);
+                }
             }
         }
     }
