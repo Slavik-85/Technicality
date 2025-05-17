@@ -285,6 +285,7 @@ public class KillAura extends Module {
         }
         else if (inBlockRange && autoBlockOverride() && manualBlock()) {
             handleAutoBlock(distanceToBB);
+            handleSwingAndAttack(distanceToBB, false);
         }
         else if ((blinkAutoBlock() && !Utils.holdingSword()) || !inBlockRange || !manualBlock()) { // for blink autoblocks
             if (blinking.get() || lag) {
@@ -389,7 +390,7 @@ public class KillAura extends Module {
             return;
         }
         if (event.phase == TickEvent.Phase.START) {
-            if (System.currentTimeMillis() - this.lastTime >= delay && target != null) {
+            if (System.currentTimeMillis() - this.lastTime >= delay) {
                 this.lastTime = System.currentTimeMillis();
                 updateAttackDelay();
                 if (target != null) {
@@ -713,7 +714,7 @@ public class KillAura extends Module {
 
     private void handleSwingAndAttack(double distance, boolean swung) {
         boolean inAttackDistance = inRange(target, attackRange.getInput() - 0.005);
-        if ((distance <= swingRange.getInput() || inAttackDistance) && shouldAttack && !swung) { // swing if in swing range or needs to attack
+        if ((distance <= swingRange.getInput() || inAttackDistance) && shouldAttack) { // swing if in swing range or needs to attack
             if (!mc.thePlayer.isBlocking() || !disableWhileBlocking.isToggled()) {
                 swingItem();
             }
@@ -906,6 +907,10 @@ public class KillAura extends Module {
         boolean inAttackDistance = inRange(target, attackRange.getInput() - 0.005);
         if (inAttackDistance) {
             attackingEntity = target;
+            if (shouldAttack) {
+                handleSwingAndAttack(distance, false);
+                shouldAttack = false;
+            }
         }
         boolean swung = false;
         switch ((int) autoBlockMode.getInput()) {
