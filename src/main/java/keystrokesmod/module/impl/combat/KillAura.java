@@ -411,6 +411,12 @@ public class KillAura extends Module {
         }
         Packet packet = e.getPacket();
         if (packet instanceof C08PacketPlayerBlockPlacement) {
+            if ((int) autoBlockMode.getInput() == 2) { // fake
+                e.setCanceled(true);
+                return;
+            }
+        }
+                if (packet instanceof C08PacketPlayerBlockPlacement) {
             C08PacketPlayerBlockPlacement p = (C08PacketPlayerBlockPlacement) e.getPacket();
             if (delayTicks >= 0) {
                 if (p.getStack() != null && p.getStack().getItem() instanceof ItemSword && p.getPlacedBlockDirection() != 255) {
@@ -737,6 +743,10 @@ public class KillAura extends Module {
         }
         else {
             attackingEntity = null;
+            if (autoBlockMode.getInput() >= 3) {
+                handleBlocking(false);
+                blockingServer = false;
+            }
         }
     }
 
@@ -804,6 +814,7 @@ public class KillAura extends Module {
         if (!Utils.holdingSword()) {
             if (blockingClient) {
                 ReflectionUtils.setItemInUse(blockingClient = false);
+                blockingServer = false;
             }
             return;
         }
@@ -842,6 +853,10 @@ public class KillAura extends Module {
             case 4: // blink
             case 5: // swap
                 ReflectionUtils.setItemInUse(this.blockingClient = blockState);
+                blockingServer = blockState;
+                if (!blockState) {
+                    sendDigPacket();
+                }
                 break;
             case 3: // partial
                 if (!blockState) {
@@ -934,20 +949,15 @@ public class KillAura extends Module {
                 break;
             case 4: // swap
                 interactTicks++;
-                if (interactTicks <= 2 && cycle == 0 || interactTicks <= 1 && cycle == 1) {
-                    if (ModuleUtils.isBlocked) {
-                        setSwapSlot();
-                    }
-                    setCurrentSlot();
-                    handleInteractAndAttack(distance, true, true, swung);
+                if (interactTicks == 1) {
+                    setSwapSlot();
                     sendBlockPacket();
-                }
-                else {
+                    blockingServer = true;
+                } else if (interactTicks >= 2) {
+                    setCurrentSlot();
+                    sendDigPacket();
+                    blockingServer = false;
                     interactTicks = 0;
-                    ++cycle;
-                    if (cycle > 1) {
-                        cycle = 0;
-                    }
                 }
                 break;
         }
@@ -1180,8 +1190,12 @@ public class KillAura extends Module {
 
     public void resetBlinkState(boolean unblock) {
         blockingServer = false;
+        blockingClient = false;
         blinking.set(false);
         releasePackets();
+        if (unblock) {
+            sendDigPacket();
+            }
         if (Raven.packetsHandler.playerSlot.get() != mc.thePlayer.inventory.currentItem && swapped) {
             mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
             Raven.packetsHandler.playerSlot.set(mc.thePlayer.inventory.currentItem);

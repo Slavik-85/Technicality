@@ -55,16 +55,16 @@ public class InvMove extends Module {
 
     public void guiUpdate() {
         boolean isHypixel = inventory.getInput() == 4;
-        chestAndOthers.setVisible(!isHypixel, this);
-        motion.setVisible(!isHypixel, this);
-        modifyMotionPost.setVisible(!isHypixel, this);
-        slowWhenNecessary.setVisible(!isHypixel, this);
-        allowJumping.setVisible(!isHypixel, this);
-        allowRotating.setVisible(!isHypixel, this);
-        allowSprinting.setVisible(!isHypixel, this);
+        boolean isLobby = Utils.getLobbyStatus() == 1;
+        chestAndOthers.setVisible(!isHypixel && !isLobby, this);
+        motion.setVisible(!isHypixel && !isLobby, this);
+        modifyMotionPost.setVisible(!isHypixel && !isLobby, this);
+        slowWhenNecessary.setVisible(!isHypixel && !isLobby, this);
+        allowJumping.setVisible(!isHypixel && !isLobby, this);
+        allowRotating.setVisible(!isHypixel && !isLobby, this);
+        allowSprinting.setVisible(!isHypixel && !isLobby, this);
         invManagerOnly.setVisible(true, this);
     }
-
     public void onDisable() {
         reset();
         releasePackets();
@@ -87,6 +87,11 @@ public class InvMove extends Module {
             allowJumping.setToggled(true);
             allowRotating.setToggled(true);
             allowSprinting.setToggled(true);
+        }
+        if (Utils.getLobbyStatus() == 1) {
+            chestAndOthers.setInput(1);
+        } else {
+            chestAndOthers.setInput(2);
         }
         if (!(mc.currentScreen instanceof ClickGui)) {
             if (setMotion) {

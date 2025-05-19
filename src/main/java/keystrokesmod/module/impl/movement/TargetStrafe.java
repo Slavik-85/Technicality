@@ -13,9 +13,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class TargetStrafe extends Module {
-    // 新增设置项
     private ButtonSetting autoVelocityReverse;
-    // 用于保存Velocity的原始状态
     private double originalVelocityMode = -1.0;
     private boolean wasVelocityEnabled = false;
     private ButtonSetting requireBhop;
@@ -90,12 +88,12 @@ public class TargetStrafe extends Module {
         if (autoVelocityReverse.isToggled() && KillAura.target != null) {
             Velocity velocityModule = ModuleManager.velocity;
             if (velocityModule != null) {
-                // 保存原始状态（使用double类型）
-                if (originalVelocityMode == -1.0) { // 正确比较double值
+
+                if (originalVelocityMode == -1.0) {
                     originalVelocityMode = velocityModule.velocityModes.getInput();
                     wasVelocityEnabled = velocityModule.isEnabled();
                 }
-                // 设置Reverse模式（对应double值2.0）
+
                 velocityModule.velocityModes.setValue(2.0);
                 if (!velocityModule.isEnabled()) {
                     velocityModule.enable();
@@ -110,13 +108,12 @@ public class TargetStrafe extends Module {
         EntityLivingBase target = KillAura.target;
         float radius = (float) radiusSetting.getInput();
         double speedMulti = speedFactor.getInput();
-        // 先计算目标位置和距离
+
         Vector2D targetPos = new Vector2D(target.posX, target.posZ);
         Vector2D playerPos = new Vector2D(mc.thePlayer.posX, mc.thePlayer.posZ);
         Vector2D toTarget = targetPos.subtract(playerPos);
-        double distance = toTarget.length(); // 现在distance已定义
+        double distance = toTarget.length();
 
-        // 方向检测逻辑（现在可以安全使用distance）
         if (!mc.thePlayer.onGround) {
             boolean pressingLeft = mc.gameSettings.keyBindLeft.isKeyDown();
             boolean pressingRight = mc.gameSettings.keyBindRight.isKeyDown();
@@ -176,9 +173,9 @@ public class TargetStrafe extends Module {
         if (originalVelocityMode != -1.0) {
             Velocity velocityModule = ModuleManager.velocity;
             if (velocityModule != null) {
-                // 恢复原始模式（使用double值）
+
                 velocityModule.velocityModes.setValue(originalVelocityMode);
-                // 恢复模块状态
+
                 if (!wasVelocityEnabled && velocityModule.isEnabled()) {
                     velocityModule.disable();
                 }

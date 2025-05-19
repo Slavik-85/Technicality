@@ -1598,7 +1598,12 @@ public class Utils {
 		return null;
 	}
 
-	public static class keybinds {
+    public static boolean inGameLobby() {
+		return mc.theWorld.getScoreboard().getObjectiveInDisplaySlot(1) != null
+				&& mc.theWorld.getScoreboard().getObjectiveInDisplaySlot(1).getDisplayName().contains("STARTING");
+	}
+
+    public static class keybinds {
 		public static int[] getMousePosition() {
 			return new int[]{Mouse.getX(), Mouse.getY()};
 		}
