@@ -32,8 +32,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class InvManager extends Module {
-    private ButtonSetting disableInGameLobby;
-    private ButtonSetting disableInSpectator;
     private long scheduledEnableTime = -1;
     private boolean isHandlingChest;
     private ButtonSetting closeChest;
@@ -77,8 +75,6 @@ public class InvManager extends Module {
         this.registerSetting(closeInventory = new ButtonSetting("Close inventory", false));
         this.registerSetting(disableInLobby = new ButtonSetting("Disable in lobby", true));
         this.registerSetting(enableWithoutGUI = new ButtonSetting("Close GUI", false));
-        this.registerSetting(disableInGameLobby = new ButtonSetting("Disable in-game lobby", true));
-        this.registerSetting(disableInSpectator = new ButtonSetting("Disable spectator", true));
         this.registerSetting(autoArmor = new SliderSetting("Auto armor", true, 3, 0, 20, 1));
         this.registerSetting(autoSort = new SliderSetting("Auto sort", true,3, 0, 20, 1));
         this.registerSetting(chestStealer = new SliderSetting("Chest stealer", true, 2, 0, 20, 1));
@@ -104,27 +100,7 @@ public class InvManager extends Module {
         this.autoSort.setSuffix(" tick");
     }
 
-    private boolean shouldWork() {
-        if (mc.thePlayer != null && mc.thePlayer.isPotionActive(Potion.invisibility)) {
-            return false;
-        }
-        if (disableInLobby.isToggled() && Utils.isLobby()) {
-            return false;
-        }
-        if (disableInGameLobby.isToggled() && Utils.inGameLobby()) {
-            return false;
-        }
-        if (disableInSpectator.isToggled() && (mc.thePlayer.isSpectator() || isDead())) {
-            Utils.print("InvManager disabled: Player-Dead");
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isDead() {
-        return mc.thePlayer.isDead || mc.thePlayer.getHealth() <= 0 || mc.thePlayer.deathTime > 0;
-    }
-            @SubscribeEvent
+    @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.action != PlayerInteractEvent.Action.RIGHT_CLICK_AIR &&
                 event.action != PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
@@ -172,17 +148,13 @@ public class InvManager extends Module {
     }
 
     public void onUpdate() {
-        if (!shouldWork()) {
-            resetDelay();
-            return;
-        }
         if (scheduledEnableTime != -1 && System.currentTimeMillis() >= scheduledEnableTime) {
             if (!enableWithoutGUI.isToggled()) {
                 enableWithoutGUI.toggle();
             }
             scheduledEnableTime = -1;
         }
-            if (disableInLobby.isToggled() && Utils.isLobby()) {
+        if (disableInLobby.isToggled() && Utils.isLobby()) {
             resetDelay();
             return;
         }
