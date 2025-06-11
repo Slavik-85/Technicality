@@ -68,7 +68,7 @@ public class Settings extends Module {
             for (int i = 1; i < capes.length; i++) {
                 String name = capes[i].toLowerCase();
                 if (i > 1) {
-                    name = "rvn_" + name;
+                    name = "technicality_" + name;
                 }
                 InputStream stream = Technicality.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + name + ".png");
                 if (stream == null) {

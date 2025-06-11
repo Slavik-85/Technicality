@@ -25,7 +25,7 @@ public class Manager extends Module {
     public static ButtonSetting enableHttpRequests;
     public static ButtonSetting enableWebSockets;
 
-    public final String DOCUMENTATION_URL = "https://blowsy.gitbook.io/raven";
+    public final String DOCUMENTATION_URL = "https://blowsy.gitbook.io/technicality";
     private final String CONFIG_DIR = mc.mcDataDir + File.separator + "keystrokes" + File.separator + "settings.txt";
     private final String SEPARATOR = ":";
     private final String SEPARATOR_FULL = SEPARATOR + " ";
