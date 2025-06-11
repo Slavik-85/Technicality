@@ -3,7 +3,7 @@ package keystrokesmod.keystroke;
 import java.io.IOException;
 
 import keystrokesmod.helper.MouseHelper;
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 
@@ -25,7 +25,7 @@ public class KeyStrokeConfigGui extends GuiScreen {
     }
 
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        Raven.getKeyStrokeRenderer().renderKeystrokes();
+        Technicality.getKeyStrokeRenderer().renderKeystrokes();
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 

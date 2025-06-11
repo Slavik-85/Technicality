@@ -1,6 +1,6 @@
 package keystrokesmod.script;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.utility.Utils;
 import net.minecraft.launchwrapper.Launch;
 
@@ -33,29 +33,29 @@ public class Script {
             if (this.scriptName == null || this.codeStr == null) {
                 return false;
             }
-            final File file = new File(Raven.scriptManager.COMPILED_DIR);
+            final File file = new File(Technicality.scriptManager.COMPILED_DIR);
             if (!file.exists() || !file.isDirectory()) {
                 file.mkdir();
             }
-            if (Raven.scriptManager.compiler == null) {
+            if (Technicality.scriptManager.compiler == null) {
                 return false;
             }
             final ScriptDiagnosticListener bp = new ScriptDiagnosticListener();
-            final StandardJavaFileManager fileManager = Raven.scriptManager.compiler.getStandardFileManager(bp, null, null);
+            final StandardJavaFileManager fileManager = Technicality.scriptManager.compiler.getStandardFileManager(bp, null, null);
             final ArrayList<String> compilationOptions = new ArrayList<>();
             compilationOptions.add("-d");
-            compilationOptions.add(Raven.scriptManager.COMPILED_DIR);
+            compilationOptions.add(Technicality.scriptManager.COMPILED_DIR);
             compilationOptions.add("-XDuseUnsharedTable");
             if (!(boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment")) {
                 compilationOptions.add("-classpath");
-                String s = Raven.scriptManager.jarPath;
+                String s = Technicality.scriptManager.jarPath;
                 try {
                     s = URLDecoder.decode(s, "UTF-8");
                 }
                 catch (UnsupportedOperationException ex2) {}
                 compilationOptions.add(s);
             }
-            boolean success = Raven.scriptManager.compiler.getTask(null, fileManager, bp, compilationOptions, null, Arrays.asList(new JavaSourceFromString(this.scriptName, this.codeStr, this.STARTING_LINE))).call();
+            boolean success = Technicality.scriptManager.compiler.getTask(null, fileManager, bp, compilationOptions, null, Arrays.asList(new JavaSourceFromString(this.scriptName, this.codeStr, this.STARTING_LINE))).call();
             if (!success) {
                 this.error = true;
                 return false;
@@ -174,7 +174,7 @@ public class Script {
     public void delete() {
         this.clazz = null;
         this.instance = null;
-        final File file = new File(Raven.scriptManager.COMPILED_DIR + File.separator + this.scriptName + ".class");
+        final File file = new File(Technicality.scriptManager.COMPILED_DIR + File.separator + this.scriptName + ".class");
         if (file.exists()) {
             file.delete();
         }
@@ -183,7 +183,7 @@ public class Script {
     public void setCode(String code) {
         STARTING_LINE = 0;
         StringBuilder fileCodeContents = new StringBuilder();
-        Iterator<String> iterator = Raven.scriptManager.imports.iterator();
+        Iterator<String> iterator = Technicality.scriptManager.imports.iterator();
         while (iterator.hasNext()) {
             STARTING_LINE++;
             fileCodeContents.append("import ").append(iterator.next()).append(";\n");

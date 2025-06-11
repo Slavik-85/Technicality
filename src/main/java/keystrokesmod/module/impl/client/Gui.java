@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.client;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -29,9 +29,9 @@ public class Gui extends Module {
     }
 
     public void onEnable() {
-        if (Utils.nullCheck() && mc.currentScreen != Raven.clickGui) {
-            mc.displayGuiScreen(Raven.clickGui);
-            Raven.clickGui.initMain();
+        if (Utils.nullCheck() && mc.currentScreen != Technicality.clickGui) {
+            mc.displayGuiScreen(Technicality.clickGui);
+            Technicality.clickGui.initMain();
         }
 
         this.disable();

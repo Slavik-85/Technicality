@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.*;
 import keystrokesmod.mixin.impl.accessor.IAccessorMinecraft;
 import keystrokesmod.module.Module;
@@ -248,7 +248,7 @@ public class KillAura extends Module {
             return;
         }
         if (sendUnBlock) {
-            if (Raven.packetsHandler.C07.sentCurrentTick.get()) {
+            if (Technicality.packetsHandler.C07.sentCurrentTick.get()) {
                 sendUnBlock = false;
                 return;
             }
@@ -454,7 +454,7 @@ public class KillAura extends Module {
         ItemStack stack = mc.thePlayer.inventory.getStackInSlot(slot);
         if (stack != null && stack.getItem() instanceof ItemSword && wasUsing && Utils.lookingAtBlock()) {
             onSwapSlot();
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 Utils.sendModuleMessage(this, "&7Scroll swap detected, setting delay to &b" + delayTicks + "&7. (&d" + mc.thePlayer.ticksExisted + "&7)");
             }
         }
@@ -465,7 +465,7 @@ public class KillAura extends Module {
         ItemStack stack = mc.thePlayer.inventory.getStackInSlot(e.slot);
         if (stack != null && stack.getItem() instanceof ItemSword && wasUsing && Utils.lookingAtBlock()) {
             onSwapSlot();
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 Utils.sendModuleMessage(this, "&7Swap detected, setting delay to &b" + delayTicks + "&7. (&d" + mc.thePlayer.ticksExisted + "&7)");
             }
         }
@@ -481,7 +481,7 @@ public class KillAura extends Module {
         }
         if (e.target == null && hostileMobs.contains(e.entity)) {
             hostileMobs.remove(e.entity);
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 Utils.sendModuleMessage(this, "&7mob stopped attack player");
             }
         }
@@ -985,14 +985,14 @@ public class KillAura extends Module {
             return;
         }
         mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-        Raven.packetsHandler.playerSlot.set(mc.thePlayer.inventory.currentItem);
+        Technicality.packetsHandler.playerSlot.set(mc.thePlayer.inventory.currentItem);
         swapped = false;
     }
 
     private void setSwapSlot() {
         int bestSwapSlot = getBestSwapSlot();
         mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(bestSwapSlot));
-        Raven.packetsHandler.playerSlot.set(bestSwapSlot);
+        Technicality.packetsHandler.playerSlot.set(bestSwapSlot);
         swapped = true;
     }
 
@@ -1196,9 +1196,9 @@ public class KillAura extends Module {
         if (unblock) {
             sendDigPacket();
             }
-        if (Raven.packetsHandler.playerSlot.get() != mc.thePlayer.inventory.currentItem && swapped) {
+        if (Technicality.packetsHandler.playerSlot.get() != mc.thePlayer.inventory.currentItem && swapped) {
             mc.thePlayer.sendQueue.addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-            Raven.packetsHandler.playerSlot.set(mc.thePlayer.inventory.currentItem);
+            Technicality.packetsHandler.playerSlot.set(mc.thePlayer.inventory.currentItem);
         }
         else if (unblock && lag && !ModuleManager.scaffold.isEnabled && ModuleUtils.isBlocked) {
             sendUnBlock = true;
@@ -1216,7 +1216,7 @@ public class KillAura extends Module {
         try {
             synchronized (blinkedPackets) {
                 for (Packet packet : blinkedPackets) {
-                    Raven.packetsHandler.handlePacket(packet);
+                    Technicality.packetsHandler.handlePacket(packet);
                     PacketUtils.sendPacketNoEvent(packet);
                 }
             }

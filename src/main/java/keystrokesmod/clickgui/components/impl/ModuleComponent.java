@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
@@ -118,7 +118,7 @@ public class ModuleComponent extends Component {
         if (this.mod.script != null && this.mod.script.error) {
             button_rgb = invalidColor;
         }
-        if (this.mod.moduleCategory() == Module.category.profiles && !(this.mod instanceof Manager) && !((ProfileModule) this.mod).saved && Raven.currentProfile.getModule() == this.mod) {
+        if (this.mod.moduleCategory() == Module.category.profiles && !(this.mod instanceof Manager) && !((ProfileModule) this.mod).saved && Technicality.currentProfile.getModule() == this.mod) {
             button_rgb = unsavedColor;
         }
 
@@ -253,8 +253,8 @@ public class ModuleComponent extends Component {
         if (this.overModuleName(x, y) && mouse == 0 && this.mod.canBeEnabled()) {
             this.mod.toggle();
             if (this.mod.moduleCategory() != Module.category.profiles) {
-                if (Raven.currentProfile != null) {
-                    ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                if (Technicality.currentProfile != null) {
+                    ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                 }
             }
         }

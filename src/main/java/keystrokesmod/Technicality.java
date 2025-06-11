@@ -36,7 +36,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
 @Mod(modid = "keystrokes", name = "KeystrokesMod", version = "KMV5", acceptedMinecraftVersions = "[1.8.9]")
-public class Raven {
+public class Technicality {
     public static boolean debug = false;
     public static Minecraft mc = Minecraft.getMinecraft();
     private static KeySrokeRenderer keySrokeRenderer;
@@ -53,7 +53,7 @@ public class Raven {
     public static KnockBackHelper knockBackHelper;
     private static boolean firstLoad;
 
-    public Raven() {
+    public Technicality() {
         moduleManager = new ModuleManager();
     }
 
@@ -115,7 +115,7 @@ public class Raven {
                     }
                 }
                 if (mc.currentScreen == null) {
-                    for (Module module : Raven.scriptManager.scripts.values()) {
+                    for (Module module : Technicality.scriptManager.scripts.values()) {
                         module.onKeyBind();
                     }
                 }
@@ -128,7 +128,7 @@ public class Raven {
         }
         else {
             if (mc.currentScreen == null && Utils.nullCheck()) {
-                for (Profile profile : Raven.profileManager.profiles) {
+                for (Profile profile : Technicality.profileManager.profiles) {
                     profile.getModule().onKeyBind();
                 }
             }

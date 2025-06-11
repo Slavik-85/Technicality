@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
@@ -73,7 +73,7 @@ public class CategoryComponent {
         this.scale = new ScaledResolution(Minecraft.getMinecraft());
         this.targetModuleY = this.moduleY;
 
-        for (Module mod : Raven.getModuleManager().inCategory(this.category)) {
+        for (Module mod : Technicality.getModuleManager().inCategory(this.category)) {
             ModuleComponent b = new ModuleComponent(mod, this, moduleRenderY);
             this.modules.add(b);
             moduleRenderY += 16;
@@ -93,19 +93,19 @@ public class CategoryComponent {
             ModuleComponent manager = new ModuleComponent(isProfile ? new Manager() : new keystrokesmod.script.Manager(), this, moduleRenderY);
             this.modules.add(manager);
 
-            if ((Raven.profileManager == null && isProfile) || (Raven.scriptManager == null && !isProfile)) {
+            if ((Technicality.profileManager == null && isProfile) || (Technicality.scriptManager == null && !isProfile)) {
                 return;
             }
 
             if (isProfile) {
-                for (Profile profile : Raven.profileManager.profiles) {
+                for (Profile profile : Technicality.profileManager.profiles) {
                     moduleRenderY += 16;
                     ModuleComponent b = new ModuleComponent(profile.getModule(), this, moduleRenderY);
                     this.modules.add(b);
                 }
             }
             else {
-                Collection<Module> modulesCollection = Raven.scriptManager.scripts.values();
+                Collection<Module> modulesCollection = Technicality.scriptManager.scripts.values();
                 List<Module> sortedModules = modulesCollection.stream().sorted(Comparator.comparing(Module::getName, String.CASE_INSENSITIVE_ORDER)).collect(Collectors.toList());
                 for (Module module : sortedModules) {
                     moduleRenderY += 16;

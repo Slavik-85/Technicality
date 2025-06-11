@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
@@ -63,8 +63,8 @@ public class BindComponent extends Component {
             }
             else if (button == 1 && this.moduleComponent.mod.moduleCategory() != Module.category.profiles && this.keySetting == null) {
                 this.moduleComponent.mod.setHidden(!this.moduleComponent.mod.isHidden());
-                if (Raven.currentProfile != null) {
-                    ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                if (Technicality.currentProfile != null) {
+                    ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                 }
             }
             else if (button > 1) {
@@ -75,8 +75,8 @@ public class BindComponent extends Component {
                     else {
                         this.moduleComponent.mod.setBind(button + 1000);
                     }
-                    if (Raven.currentProfile != null) {
-                        ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                    if (Technicality.currentProfile != null) {
+                        ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                     }
                     this.isBinding = false;
                 }
@@ -93,8 +93,8 @@ public class BindComponent extends Component {
             else {
                 this.moduleComponent.mod.setBind(scroll > 0 ? 1069 : 1070); // might cause issues if your mouse has more than 69 buttons for some reason???
             }
-            if (Raven.currentProfile != null) {
-                ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+            if (Technicality.currentProfile != null) {
+                ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
             }
             this.isBinding = false;
         }
@@ -114,13 +114,13 @@ public class BindComponent extends Component {
                         this.moduleComponent.mod.setBind(0);
                     }
                 }
-                if (Raven.currentProfile != null) {
-                    ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                if (Technicality.currentProfile != null) {
+                    ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                 }
             }
             else {
-                if (Raven.currentProfile != null) {
-                    ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                if (Technicality.currentProfile != null) {
+                    ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                 }
                 if (this.keySetting != null) {
                     this.keySetting.setKey(keybind);

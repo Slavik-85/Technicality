@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.setting.impl.GroupSetting;
 import net.minecraft.client.Minecraft;
@@ -63,7 +63,7 @@ public class GroupComponent extends Component {
     public boolean onClick(int x, int y, int b) {
         if (this.i(x, y) && b == 1 && this.component.isOpened) {
             this.opened = !this.opened;
-            for (CategoryComponent categoryComponent : Raven.clickGui.categories) {
+            for (CategoryComponent categoryComponent : Technicality.clickGui.categories) {
                 if (categoryComponent.category == this.component.mod.moduleCategory()) {
                     for (ModuleComponent moduleComponent : categoryComponent.modules) {
                         if (moduleComponent.mod.getName().equals(this.component.mod.getName())) {

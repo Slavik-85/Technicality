@@ -1,6 +1,6 @@
 package keystrokesmod.utility.command.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.helper.DebugHelper;
 import keystrokesmod.utility.command.Command;
 
@@ -12,8 +12,8 @@ public class Debug extends Command {
     @Override
     public void onExecute(String[] args) {
         if (args.length <= 1) {
-            Raven.debug = !Raven.debug;
-            chatWithPrefix("&7Debug " + (Raven.debug ? "&aenabled" : "&cdisabled") + "&7.");
+            Technicality.debug = !Technicality.debug;
+            chatWithPrefix("&7Debug " + (Technicality.debug ? "&aenabled" : "&cdisabled") + "&7.");
         }
         else if (args.length == 2) {
             if (args[1].equals("mixin")) {

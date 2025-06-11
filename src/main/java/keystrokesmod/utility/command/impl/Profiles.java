@@ -1,6 +1,6 @@
 package keystrokesmod.utility.command.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.command.Command;
 import keystrokesmod.utility.profile.Profile;
@@ -17,7 +17,7 @@ public class Profiles extends Command { // credit: https://github.com/BoxDevelop
     @Override
     public void onExecute(String[] args) {
         if (args.length < 2) {
-            List<Profile> profiles = Raven.profileManager.profiles;
+            List<Profile> profiles = Technicality.profileManager.profiles;
             if (profiles.isEmpty()) {
                 chatWithPrefix("&7No profiles found");
                 return;
@@ -25,7 +25,7 @@ public class Profiles extends Command { // credit: https://github.com/BoxDevelop
             chatWithPrefix("&b" + profiles.size() + " &7profile" + (profiles.size() == 1 ? "" : "s") + " loaded.");
             for (Profile profile : profiles) {
                 chatWithPrefix(" &7" + profile.getName() +
-                        (profile == Raven.currentProfile ? " &7(&bcurrent&7)" : ""));
+                        (profile == Technicality.currentProfile ? " &7(&bcurrent&7)" : ""));
             }
             return;
         }
@@ -36,9 +36,9 @@ public class Profiles extends Command { // credit: https://github.com/BoxDevelop
             case "save":
             case "s":
                 if (args.length < 3) {
-                    if (Raven.currentProfile != null) {
-                        Utils.sendMessage("&7Saved profile: &b" + Raven.currentProfile);
-                        Raven.profileManager.saveProfile(Raven.currentProfile);
+                    if (Technicality.currentProfile != null) {
+                        Utils.sendMessage("&7Saved profile: &b" + Technicality.currentProfile);
+                        Technicality.profileManager.saveProfile(Technicality.currentProfile);
                     }
                     else {
                         syntaxError();
@@ -47,9 +47,9 @@ public class Profiles extends Command { // credit: https://github.com/BoxDevelop
                 }
                 String saveName = args[2];
                 Profile newProfile = new Profile(saveName, 0);
-                Raven.profileManager.saveProfile(newProfile);
+                Technicality.profileManager.saveProfile(newProfile);
                 chatWithPrefix("&7Saved profile: &b" + saveName);
-                Raven.profileManager.loadProfiles();
+                Technicality.profileManager.loadProfiles();
                 break;
             case "load":
             case "l":
@@ -58,11 +58,11 @@ public class Profiles extends Command { // credit: https://github.com/BoxDevelop
                     return;
                 }
                 String loadName = args[2];
-                if (Raven.profileManager.getProfile(loadName) == null) {
+                if (Technicality.profileManager.getProfile(loadName) == null) {
                     chatWithPrefix("&b" + loadName + " &7does not exist");
                     return;
                 }
-                Raven.profileManager.loadProfile(loadName);
+                Technicality.profileManager.loadProfile(loadName);
                 chatWithPrefix("&7Enabled profile: &b" + loadName);
                 break;
             case "delete":
@@ -73,13 +73,13 @@ public class Profiles extends Command { // credit: https://github.com/BoxDevelop
                     return;
                 }
                 String deleteName = args[2];
-                if (Raven.profileManager.getProfile(deleteName) == null) {
+                if (Technicality.profileManager.getProfile(deleteName) == null) {
                     chatWithPrefix("&cProfile &b" + deleteName + " &7does not exist");
                     return;
                 }
-                Raven.profileManager.deleteProfile(deleteName);
+                Technicality.profileManager.deleteProfile(deleteName);
                 chatWithPrefix("&7Removed profile: &b" + deleteName);
-                Raven.profileManager.loadProfiles();
+                Technicality.profileManager.loadProfiles();
                 break;
             case "rename":
                 if (args.length < 4) {
@@ -88,21 +88,21 @@ public class Profiles extends Command { // credit: https://github.com/BoxDevelop
                 }
                 String oldName = args[2];
                 String newName = args[3];
-                Profile oldProfile = Raven.profileManager.getProfile(oldName);
+                Profile oldProfile = Technicality.profileManager.getProfile(oldName);
                 if (oldProfile == null) {
                     chatWithPrefix("&b" + oldName + " &7does not exist");
                     return;
                 }
-                if (Raven.profileManager.getProfile(newName) != null) {
+                if (Technicality.profileManager.getProfile(newName) != null) {
                     chatWithPrefix("&b" + newName + " &7already exists");
                     return;
                 }
                 Profile renamedProfile = new Profile(newName, oldProfile.getBind()); // save this to that pls
-                Raven.profileManager.saveProfile(renamedProfile);
-                Raven.profileManager.deleteProfile(oldName); // delete old shit (i think thats needed)
+                Technicality.profileManager.saveProfile(renamedProfile);
+                Technicality.profileManager.deleteProfile(oldName); // delete old shit (i think thats needed)
                 chatWithPrefix("&b" + oldName + " &7renamed to &b" + newName);
-                Raven.profileManager.loadProfiles(); // ok so fun fact!! you need to load them again (i think??)
-                Raven.profileManager.loadProfile(newName);
+                Technicality.profileManager.loadProfiles(); // ok so fun fact!! you need to load them again (i think??)
+                Technicality.profileManager.loadProfile(newName);
                 break;
             default:
                 syntaxError();
@@ -117,7 +117,7 @@ public class Profiles extends Command { // credit: https://github.com/BoxDevelop
         }
         else if (args.length == 3 && !args[1].equalsIgnoreCase("save") && !args[1].equalsIgnoreCase("s")) {
             List<String> profileNames = new ArrayList<>();
-            for (Profile profile : Raven.profileManager.profiles) {
+            for (Profile profile : Technicality.profileManager.profiles) {
                 profileNames.add(profile.getName());
             }
             return filterStartingWith(args[2], profileNames);

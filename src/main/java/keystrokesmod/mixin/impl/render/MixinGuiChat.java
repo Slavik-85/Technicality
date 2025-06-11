@@ -1,6 +1,6 @@
 package keystrokesmod.mixin.impl.render;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.module.ModuleManager;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiTextField;
@@ -32,7 +32,7 @@ public abstract class MixinGuiChat extends MixinGuiScreen
     @Inject(method = "keyTyped", at = @At("RETURN"))
     private void updateLength(CallbackInfo callbackInfo) {
         if (inputField.getText().startsWith((".")) && ModuleManager.canExecuteChatCommand()) {
-            Raven.commandManager.autoComplete(inputField.getText());
+            Technicality.commandManager.autoComplete(inputField.getText());
         }
         else {
             inputField.setMaxStringLength(100);
@@ -41,10 +41,10 @@ public abstract class MixinGuiChat extends MixinGuiScreen
 
     @Inject(method = "sendAutocompleteRequest", at = @At("HEAD"), cancellable = true)
     private void handleClientCommandCompletion(String full, final String ignored, CallbackInfo callbackInfo) {
-        if (Raven.commandManager.autoComplete(full) && ModuleManager.canExecuteChatCommand()) {
+        if (Technicality.commandManager.autoComplete(full) && ModuleManager.canExecuteChatCommand()) {
             waitingOnAutocomplete = true;
 
-            String[] latestAutoComplete = Raven.commandManager.latestAutoComplete;
+            String[] latestAutoComplete = Technicality.commandManager.latestAutoComplete;
 
             if (full.toLowerCase().endsWith(latestAutoComplete[latestAutoComplete.length - 1].toLowerCase())) {
                 return;

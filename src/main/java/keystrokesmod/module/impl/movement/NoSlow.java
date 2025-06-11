@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.movement;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.*;
 import keystrokesmod.mixin.impl.accessor.IAccessorItemFood;
 import keystrokesmod.module.Module;
@@ -78,7 +78,7 @@ public class NoSlow extends Module {
         }
         switch ((int) mode.getInput()) {
             case 1:
-                if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.packetsHandler.C07.get()) {
+                if (mc.thePlayer.ticksExisted % 3 == 0 && !Technicality.packetsHandler.C07.get()) {
                     mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                 }
                 break;
@@ -86,7 +86,7 @@ public class NoSlow extends Module {
                 postPlace = true;
                 break;
             case 3:
-                if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.packetsHandler.C07.get()) {
+                if (mc.thePlayer.ticksExisted % 3 == 0 && !Technicality.packetsHandler.C07.get()) {
                     mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 1, null, 0, 0, 0));
                 }
                 break;
@@ -98,7 +98,7 @@ public class NoSlow extends Module {
     @SubscribeEvent
     public void onPostMotion(PostMotionEvent e) {
         if (postPlace && mode.getInput() == 2) {
-            if (mc.thePlayer.ticksExisted % 3 == 0 && !Raven.packetsHandler.C07.get()) {
+            if (mc.thePlayer.ticksExisted % 3 == 0 && !Technicality.packetsHandler.C07.get()) {
                 mc.thePlayer.sendQueue.addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
             }
             postPlace = false;

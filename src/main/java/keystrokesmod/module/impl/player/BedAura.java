@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.*;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -213,14 +213,14 @@ public class BedAura extends Module {
     public void onPreMotion(PreMotionEvent e) {
 
         if (stopAutoblock) {
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 Utils.sendModuleMessage(this, "&7stopping autoblock (&3" + mc.thePlayer.ticksExisted + "&7).");
             }
         }
 
         if (groundSpoof.isToggled() && !mc.thePlayer.isInWater() && spoofGround) {
             e.setOnGround(true);
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 Utils.sendModuleMessage(this, "&7ground spoof (&3" + mc.thePlayer.ticksExisted + "&7).");
             }
         }
@@ -228,14 +228,14 @@ public class BedAura extends Module {
         if (startPacket) {
             mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.START_DESTROY_BLOCK, packetPos, EnumFacing.UP));
             swing();
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 Utils.sendModuleMessage(this, "sending c07 &astart &7break &7(&b" + mc.thePlayer.ticksExisted + "&7)");
             }
         }
         if (stopPacket) {
             mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, packetPos, EnumFacing.UP));
             swing();
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 Utils.sendModuleMessage(this, "sending c07 &cstop &7break &7(&b" + mc.thePlayer.ticksExisted + "&7)");
             }
         }
@@ -488,7 +488,7 @@ public class BedAura extends Module {
     }
 
     private void resetSlot() {
-        if (Raven.packetsHandler != null && Raven.packetsHandler.playerSlot != null && Utils.nullCheck() && Raven.packetsHandler.playerSlot.get() != mc.thePlayer.inventory.currentItem && mode.getInput() == 2) {
+        if (Technicality.packetsHandler != null && Technicality.packetsHandler.playerSlot != null && Utils.nullCheck() && Technicality.packetsHandler.playerSlot.get() != mc.thePlayer.inventory.currentItem && mode.getInput() == 2) {
             setPacketSlot(mc.thePlayer.inventory.currentItem);
         }
         else if (lastSlot != -1) {
@@ -525,7 +525,7 @@ public class BedAura extends Module {
         float[] rotations = RotationUtils.getRotations(currentBlock == null ? rotateLastBlock : currentBlock, e.getYaw(), e.getPitch());
         e.setYaw(RotationUtils.applyVanilla(rotations[0]));
         e.setPitch(rotations[1]);
-        if (Raven.debug) {
+        if (Technicality.debug) {
             Utils.sendModuleMessage(this, "&7rotating (&3" + mc.thePlayer.ticksExisted + "&7).");
         }
     }
@@ -638,7 +638,7 @@ public class BedAura extends Module {
         if (slot == -1) {
             return;
         }
-        Raven.packetsHandler.updateSlot(slot);
+        Technicality.packetsHandler.updateSlot(slot);
         stopAutoblock = true;
     }
 
@@ -731,7 +731,7 @@ public class BedAura extends Module {
             if (lastProgress != 0 && breakProgress >= lastProgress - vanillaProgress) {
                 if (breakProgress >= lastProgress) {
                     if (mode.getInput() == 2) {
-                        if (Raven.debug) {
+                        if (Technicality.debug) {
                             Utils.sendModuleMessage(this, "&7setting slot &7(&b" + mc.thePlayer.ticksExisted + "&7)");
                         }
                         setPacketSlot(Utils.getTool(block));

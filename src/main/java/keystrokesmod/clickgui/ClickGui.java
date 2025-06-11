@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.clickgui.components.impl.BindComponent;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
@@ -50,9 +50,9 @@ public class ClickGui extends GuiScreen {
     public int previousScale;
     private static boolean isNotFirstOpen;
 
-    private String clientName = "Raven bS Plus2";
+    private String clientName = "Technicality";
     private String clientVersion = "beta";
-    private String developer = "Nico";
+    private String developer = "TechnoDev";
     private int color = (new Color(255, 192, 220)).getRGB();
     private int color2 = (new Color(0, 0, 0)).getRGB();
     private int color3 = (new Color(255, 255, 255)).getRGB();
@@ -81,7 +81,7 @@ public class ClickGui extends GuiScreen {
 
     public void initMain() {
         (this.logoSmoothWidth = this.smoothEntity = this.blurSmooth = this.backgroundFade = new Timer(500.0F)).start();
-        this.sf = Raven.getScheduledExecutor().schedule(() -> {
+        this.sf = Technicality.getScheduledExecutor().schedule(() -> {
             (this.logoSmoothLength = new Timer(650.0F)).start();
         }, 650L, TimeUnit.MILLISECONDS);
     }

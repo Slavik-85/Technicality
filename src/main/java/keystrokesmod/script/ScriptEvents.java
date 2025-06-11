@@ -1,6 +1,6 @@
 package keystrokesmod.script;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.*;
 import keystrokesmod.module.Module;
 import keystrokesmod.script.model.Entity;
@@ -33,7 +33,7 @@ public class ScriptEvents {
         if (Utils.stripColor(e.message.getUnformattedText()).isEmpty()) {
             return;
         }
-        if (Raven.scriptManager.invokeBoolean("onChat", module, e.message.getUnformattedText()) == 0) {
+        if (Technicality.scriptManager.invokeBoolean("onChat", module, e.message.getUnformattedText()) == 0) {
             e.setCanceled(true);
         }
     }
@@ -47,7 +47,7 @@ public class ScriptEvents {
             return;
         }
         CPacket packet = PacketHandler.convertServerBound(e.getPacket());
-        if (packet != null && Raven.scriptManager.invokeBoolean("onPacketSent", module, packet) == 0) {
+        if (packet != null && Technicality.scriptManager.invokeBoolean("onPacketSent", module, packet) == 0) {
             e.setCanceled(true);
         }
     }
@@ -58,7 +58,7 @@ public class ScriptEvents {
             return;
         }
         SPacket packet = PacketHandler.convertClientBound(e.getPacket());
-        if (packet != null && Raven.scriptManager.invokeBoolean("onPacketReceived", module, packet) == 0) {
+        if (packet != null && Technicality.scriptManager.invokeBoolean("onPacketReceived", module, packet) == 0) {
             e.setCanceled(true);
         }
     }
@@ -70,14 +70,14 @@ public class ScriptEvents {
         }
         Entity target = Entity.convert(e.target);
         Entity attacker = Entity.convert(e.attacker);
-        if (Raven.scriptManager.invokeBoolean("onAttackEntity", module, target, attacker) == 0) {
+        if (Technicality.scriptManager.invokeBoolean("onAttackEntity", module, target, attacker) == 0) {
             e.setCanceled(true);
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onClientRotations(ClientRotationEvent e) {
-        Float[] rotations = Raven.scriptManager.invokeFloatArray("getRotations", module);
+        Float[] rotations = Technicality.scriptManager.invokeFloatArray("getRotations", module);
         if (rotations == null || rotations.length == 0 || rotations.length > 2) {
             return;
         }
@@ -94,7 +94,7 @@ public class ScriptEvents {
         if (e.isCanceled()) {
             return;
         }
-        if (Raven.scriptManager.invokeBoolean("onKeyPress", module, e.typedChar, e.keyCode) == 0) {
+        if (Technicality.scriptManager.invokeBoolean("onKeyPress", module, e.typedChar, e.keyCode) == 0) {
             e.setCanceled(true);
         }
     }
@@ -104,17 +104,17 @@ public class ScriptEvents {
         if (!Utils.nullCheck()) {
             return;
         }
-        Raven.scriptManager.invoke("onRenderWorld", module, e.partialTicks);
+        Technicality.scriptManager.invoke("onRenderWorld", module, e.partialTicks);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreUpdate(PreUpdateEvent e) {
-        Raven.scriptManager.invoke("onPreUpdate", module);
+        Technicality.scriptManager.invoke("onPreUpdate", module);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPostUpdate(PostUpdateEvent e) {
-        Raven.scriptManager.invoke("onPostUpdate", module);
+        Technicality.scriptManager.invoke("onPostUpdate", module);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -122,12 +122,12 @@ public class ScriptEvents {
         if (e.phase != TickEvent.Phase.END || !Utils.nullCheck()) {
             return;
         }
-        Raven.scriptManager.invoke("onRenderTick", module, e.renderTickTime);
+        Technicality.scriptManager.invoke("onRenderTick", module, e.renderTickTime);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onAntiCheatFlag(AntiCheatFlagEvent e) {
-        Raven.scriptManager.invoke("onAntiCheatFlag", module, e.flag, Entity.convert(e.entity));
+        Technicality.scriptManager.invoke("onAntiCheatFlag", module, e.flag, Entity.convert(e.entity));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -135,18 +135,18 @@ public class ScriptEvents {
         if (e.guiScreen == null) {
             return;
         }
-        Raven.scriptManager.invoke("onGuiUpdate", module, e.guiScreen.getClass().getSimpleName(), e.opened);
+        Technicality.scriptManager.invoke("onGuiUpdate", module, e.guiScreen.getClass().getSimpleName(), e.opened);
     }
 
     @SubscribeEvent
     public void onDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent e) {
-        Raven.scriptManager.invoke("onDisconnect", module);
+        Technicality.scriptManager.invoke("onDisconnect", module);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPreMotion(PreMotionEvent e) {
         PlayerState playerState = new PlayerState(e, (byte) 0);
-        Raven.scriptManager.invoke("onPreMotion", module, playerState);
+        Technicality.scriptManager.invoke("onPreMotion", module, playerState);
         if (e.isEquals(playerState)) {
             return;
         }
@@ -167,22 +167,22 @@ public class ScriptEvents {
         if (e.entity == null) {
             return;
         }
-        Raven.scriptManager.invoke("onWorldJoin", module, Entity.convert(e.entity));
+        Technicality.scriptManager.invoke("onWorldJoin", module, Entity.convert(e.entity));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPostInput(PostPlayerInputEvent e) {
-        Raven.scriptManager.invoke("onPostPlayerInput", module);
+        Technicality.scriptManager.invoke("onPostPlayerInput", module);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPostMotion(PostMotionEvent e) {
-        Raven.scriptManager.invoke("onPostMotion", module);
+        Technicality.scriptManager.invoke("onPostMotion", module);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onMouse(MouseEvent e) {
-        if (Raven.scriptManager.invokeBoolean("onMouse", module, e.button, e.buttonstate) == 0) {
+        if (Technicality.scriptManager.invokeBoolean("onMouse", module, e.button, e.buttonstate) == 0) {
             e.setCanceled(true);
         }
     }
