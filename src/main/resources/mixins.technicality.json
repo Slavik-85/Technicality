@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "keystrokesmod.mixin.impl",
-  "refmap": "mixins.raven.refmap.json",
+  "refmap": "mixins.technicality.refmap.json",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
     "entity.MixinEntity",

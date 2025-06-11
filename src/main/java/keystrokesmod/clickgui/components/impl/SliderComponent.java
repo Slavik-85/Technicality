@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -119,8 +119,8 @@ public class SliderComponent extends Component {
                 ModuleManager.sort();
             }
 
-            if (Raven.currentProfile != null) {
-                ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+            if (Technicality.currentProfile != null) {
+                ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
             }
         }
     }

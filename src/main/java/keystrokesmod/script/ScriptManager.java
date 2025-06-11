@@ -1,6 +1,6 @@
 package keystrokesmod.script;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.module.Module;
 import keystrokesmod.utility.NetworkUtils;
@@ -130,7 +130,7 @@ public class ScriptManager {
             module.disable();
         }
 
-        for (CategoryComponent categoryComponent : Raven.clickGui.categories) {
+        for (CategoryComponent categoryComponent : Technicality.clickGui.categories) {
             if (categoryComponent.category == Module.category.scripts) {
                 categoryComponent.reloadModules(false);
             }
@@ -191,9 +191,9 @@ public class ScriptManager {
         script.setCode(scriptContents.toString());
         script.run();
         Module module = new Module(script);
-        Raven.scriptManager.scripts.put(script, module);
+        Technicality.scriptManager.scripts.put(script, module);
         ScriptDefaults.reloadModules();
-        Raven.scriptManager.invoke("onLoad", module);
+        Technicality.scriptManager.invoke("onLoad", module);
         return !script.error;
     }
 

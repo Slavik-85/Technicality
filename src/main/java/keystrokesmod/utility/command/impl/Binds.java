@@ -1,6 +1,6 @@
 package keystrokesmod.utility.command.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
 import keystrokesmod.utility.command.Command;
@@ -60,11 +60,11 @@ public class Binds extends Command {
         for (Module module : ModuleManager.modules) {
             addModuleIfMatches(binds, module, keycode);
         }
-        for (Profile profile : Raven.profileManager.profiles) {
+        for (Profile profile : Technicality.profileManager.profiles) {
             Module module = profile.getModule();
             addModuleIfMatches(binds, module, keycode);
         }
-        for (Module scriptModule : Raven.scriptManager.scripts.values()) {
+        for (Module scriptModule : Technicality.scriptManager.scripts.values()) {
             addModuleIfMatches(binds, scriptModule, keycode);
         }
         return binds;

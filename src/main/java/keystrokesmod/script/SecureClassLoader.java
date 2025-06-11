@@ -1,6 +1,6 @@
 package keystrokesmod.script;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -25,7 +25,7 @@ public class SecureClassLoader extends URLClassLoader {
     private boolean isClassSafe(String name) {
         boolean hasAllowedSuffix = name.endsWith("Exception") || name.endsWith("Throwable");
 
-        boolean isAllowedImport = Raven.scriptManager.imports.stream().anyMatch(prefix -> name.toLowerCase().startsWith(prefix));
+        boolean isAllowedImport = Technicality.scriptManager.imports.stream().anyMatch(prefix -> name.toLowerCase().startsWith(prefix));
         boolean isScriptClass = name.startsWith("sc_") && !name.contains(".");
 
         boolean isWhitelistedPackage = WHITELISTED_PACKAGES.stream().anyMatch(name::startsWith);
