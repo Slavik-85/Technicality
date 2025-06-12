@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.mixin.interfaces.IMixinItemRenderer;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -53,7 +53,7 @@ public class AutoTool extends Module {
 
     public void onUpdate() {
         if (spoofItem.isToggled() && previousSlot != mc.thePlayer.inventory.currentItem && previousSlot != -1) {
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 Utils.sendModuleMessage(this, "&7Modifying held item renderer");
             }
             ((IMixinItemRenderer) mc.getItemRenderer()).setCancelUpdate(true);

@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -44,7 +44,7 @@ public class SliderComponent extends Component {
 
     @Override
     public void render() {
-        RenderUtils.drawRoundedRectangle(this.moduleComponent.categoryComponent.getX() + 4 + (xOffset / 2), this.moduleComponent.categoryComponent.getY() + this.o + 11, this.moduleComponent.categoryComponent.getX() + 4 + this.moduleComponent.categoryComponent.getWidth() - 8, this.moduleComponent.categoryComponent.getY() + this.o + 15, 4, -12302777);
+        RenderUtils.drawRoundedRectangle(this.moduleComponent.categoryComponent.getX() + 4 + (xOffset / 2), this.moduleComponent.categoryComponent.getY() + this.o + 11, this.moduleComponent.categoryComponent.getX() + 4 + this.moduleComponent.categoryComponent.getWidth() - 8, this.moduleComponent.categoryComponent.getY() + this.o + 15, 4, -1);
         float left = this.moduleComponent.categoryComponent.getX() + 4 + (xOffset / 2);
         float right = (float) (left + this.width);
 
@@ -52,7 +52,7 @@ public class SliderComponent extends Component {
             right = left + 84;
         }
 
-        RenderUtils.drawRoundedRectangle(left, this.moduleComponent.categoryComponent.getY() + this.o + 11, right, this.moduleComponent.categoryComponent.getY() + this.o + 15, 4, Color.getHSBColor((float) (System.currentTimeMillis() % 11000L) / 11000.0F, 0.75F, 0.9F).getRGB());
+        RenderUtils.drawRoundedRectangle(left, this.moduleComponent.categoryComponent.getY() + this.o + 11, right, this.moduleComponent.categoryComponent.getY() + this.o + 15, 4, -1);
 
         GL11.glPushMatrix();
         GL11.glScaled(0.5, 0.5, 0.5);
@@ -62,7 +62,7 @@ public class SliderComponent extends Component {
         String valueText;
 
         if (input == -1 && this.sliderSetting.canBeDisabled) {
-            valueText = "§cDisabled";
+            valueText = "Disabled";
             suffix = "";
         }
         else {
@@ -79,7 +79,7 @@ public class SliderComponent extends Component {
             }
         }
 
-        Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(this.sliderSetting.getName() + ": " + (this.sliderSetting.isString ? "§e" : "§b") + valueText + suffix, (float) ((this.moduleComponent.categoryComponent.getX() + 4) * 2) + xOffset, (float) ((this.moduleComponent.categoryComponent.getY() + this.o + 3) * 2), -1);
+        Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(this.sliderSetting.getName() + ": " + valueText + suffix, (float) ((this.moduleComponent.categoryComponent.getX() + 4) * 2) + xOffset, (float) ((this.moduleComponent.categoryComponent.getY() + this.o + 3) * 2), -1);
         GL11.glPopMatrix();
     }
 
@@ -119,8 +119,8 @@ public class SliderComponent extends Component {
                 ModuleManager.sort();
             }
 
-            if (Raven.currentProfile != null) {
-                ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+            if (Technicality.currentProfile != null) {
+                ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
             }
         }
     }

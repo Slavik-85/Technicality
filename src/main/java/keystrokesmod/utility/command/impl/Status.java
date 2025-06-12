@@ -1,6 +1,6 @@
 package keystrokesmod.utility.command.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;

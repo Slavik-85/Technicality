@@ -7,7 +7,7 @@ import keystrokesmod.utility.Utils;
 import net.minecraft.client.network.NetworkPlayerInfo;
 
 public class NameHider extends Module {
-    public static String fakeName = "raven";
+    public static String fakeName = "Technicality";
     public static ButtonSetting hideAllNames;
 
     public NameHider() {

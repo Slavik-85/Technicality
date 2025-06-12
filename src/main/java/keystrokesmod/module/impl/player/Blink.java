@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.*;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -83,7 +83,7 @@ public class Blink extends Module {
         }
         synchronized (blinkedPackets) {
             for (Packet packet : blinkedPackets) {
-                Raven.packetsHandler.handlePacket(packet);
+                Technicality.packetsHandler.handlePacket(packet);
                 PacketUtils.sendPacketNoEvent(packet);
             }
         }

@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.ReceiveAllPacketsEvent;
 import keystrokesmod.event.ReceivePacketEvent;
@@ -151,7 +151,7 @@ public class AntiVoid extends Module {
         if (!ModuleManager.blink.isEnabled()) {
             synchronized (blinkedPackets) {
                 for (Packet packet : blinkedPackets) {
-                    Raven.packetsHandler.handlePacket(packet);
+                    Technicality.packetsHandler.handlePacket(packet);
                     PacketUtils.sendPacketNoEvent(packet);
                 }
             }

@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.ClientRotationEvent;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -68,7 +68,7 @@ public class WaterBucket extends Module {
         if (!(shouldPickup = pickupWater.isToggled())) {
             this.lastSlot = -1;
         }
-        if (Raven.debug) {
+        if (Technicality.debug) {
             Utils.sendModuleMessage(this, "&7Placed with motionY &d" + Utils.round(mc.thePlayer.motionY, 2) + " &7and fall distance &d" + Utils.round(mc.thePlayer.fallDistance, 2));
         }
     }

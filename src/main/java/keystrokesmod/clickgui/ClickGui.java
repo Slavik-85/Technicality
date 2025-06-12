@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.clickgui.components.impl.BindComponent;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
@@ -50,10 +50,10 @@ public class ClickGui extends GuiScreen {
     public int previousScale;
     private static boolean isNotFirstOpen;
 
-    private String clientName = "Raven bS Plus2";
+    private String clientName = "Technicality";
     private String clientVersion = "beta";
-    private String developer = "Nico";
-    private int color = (new Color(255, 192, 220)).getRGB();
+    private String developer = "TechnoDev";
+    private int color = Color.white.getRGB();
     private int color2 = (new Color(0, 0, 0)).getRGB();
     private int color3 = (new Color(255, 255, 255)).getRGB();
 
@@ -81,7 +81,7 @@ public class ClickGui extends GuiScreen {
 
     public void initMain() {
         (this.logoSmoothWidth = this.smoothEntity = this.blurSmooth = this.backgroundFade = new Timer(500.0F)).start();
-        this.sf = Raven.getScheduledExecutor().schedule(() -> {
+        this.sf = Technicality.getScheduledExecutor().schedule(() -> {
             (this.logoSmoothLength = new Timer(650.0F)).start();
         }, 650L, TimeUnit.MILLISECONDS);
     }
@@ -110,33 +110,11 @@ public class ClickGui extends GuiScreen {
 
     @Override
     public void drawScreen(int x, int y, float p) {
-        if (Gui.backgroundBlur.getInput() != 0) {
-            BlurUtils.prepareBlur();
-            RoundedUtils.drawRound(0, 0, this.width, this.height, 0.0f, true, Color.black);
-            float inputToRange = (float) (3 * ((Gui.backgroundBlur.getInput() + 35) / 100));
-            BlurUtils.blurEnd(2, this.blurSmooth.getValueFloat(0, inputToRange, 1));
-        }
-        if (Gui.darkBackground.isToggled()) {
-            drawRect(0, 0, this.width, this.height, (int) (this.backgroundFade.getValueFloat(0.0F, 0.7F, 2) * 255.0F) << 24);
-        }
+        drawRect(0, 0, this.width, this.height, 0x90000000);
         int r;
         if (!Gui.removeWatermark.isToggled()) {
-            int h = this.height / 4;
-            int wd = this.width / 2;
-            int w_c = 30 - this.logoSmoothWidth.getValueInt(0, 30, 3);
-            this.drawCenteredString(this.fontRendererObj, "r", wd + 1 - w_c, h - 25, Utils.getChroma(2L, 1500L));
-            this.drawCenteredString(this.fontRendererObj, "a", wd - w_c, h - 15, Utils.getChroma(2L, 1200L));
-            this.drawCenteredString(this.fontRendererObj, "v", wd - w_c, h - 5, Utils.getChroma(2L, 900L));
-            this.drawCenteredString(this.fontRendererObj, "e", wd - w_c, h + 5, Utils.getChroma(2L, 600L));
-            this.drawCenteredString(this.fontRendererObj, "n", wd - w_c, h + 15, Utils.getChroma(2L, 300L));
-            this.drawCenteredString(this.fontRendererObj, "P+", wd + 1 + w_c, h + 30, Utils.getChroma(2L, 0L));
-            this.drawVerticalLine(wd - 10 - w_c, h - 30, h + 43, Color.white.getRGB());
-            this.drawVerticalLine(wd + 10 + w_c, h - 30, h + 43, Color.white.getRGB());
-            if (this.logoSmoothLength != null) {
-                r = this.logoSmoothLength.getValueInt(0, 20, 2);
-                this.drawHorizontalLine(wd - 10, wd - 10 + r, h - 29, -1);
-                this.drawHorizontalLine(wd + 10, wd + 10 - r, h + 42, -1);
-            }
+            String text = clientName + " - " + clientVersion;
+            this.drawCenteredString(this.fontRendererObj, text, this.width / 2, this.height / 4, Utils.getChroma(2L, 0L));
         }
 
         for (CategoryComponent c : categories) {
@@ -148,14 +126,6 @@ public class ClickGui extends GuiScreen {
             }
         }
 
-        GL11.glColor3f(1.0f, 1.0f, 1.0f);
-        if (!Gui.removePlayerModel.isToggled()) {
-            GlStateManager.pushMatrix();
-            GlStateManager.disableBlend();
-            GuiInventory.drawEntityOnScreen(this.width + 15 - this.smoothEntity.getValueInt(0, 40, 2), this.height - 10, 40, (float) (this.width - 25 - x), (float) (this.height - 50 - y), this.mc.thePlayer);
-            GlStateManager.enableBlend();
-            GlStateManager.popMatrix();
-        }
 
         onRenderTick(p);
 

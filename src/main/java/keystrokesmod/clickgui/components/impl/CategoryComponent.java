@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
@@ -9,6 +9,7 @@ import keystrokesmod.utility.Timer;
 import keystrokesmod.utility.Utils;
 import keystrokesmod.utility.profile.Manager;
 import keystrokesmod.utility.profile.Profile;
+import keystrokesmod.utility.shader.RoundedUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -47,9 +48,7 @@ public class CategoryComponent {
     public float big;
     private float bigSettings;
     private final int translucentBackground = new Color(0, 0, 0, 110).getRGB();
-    private final int regularOutline = new Color(81, 99, 149).getRGB();
-    private final int regularOutline2 = new Color(97, 67, 133).getRGB();
-    private final int categoryNameColor = new Color(220, 220, 220).getRGB();
+    private final int categoryNameColor = Color.white.getRGB();
     private float lastHeight;
     public float moduleY;
     private float lastModuleY;
@@ -73,7 +72,7 @@ public class CategoryComponent {
         this.scale = new ScaledResolution(Minecraft.getMinecraft());
         this.targetModuleY = this.moduleY;
 
-        for (Module mod : Raven.getModuleManager().inCategory(this.category)) {
+        for (Module mod : Technicality.getModuleManager().inCategory(this.category)) {
             ModuleComponent b = new ModuleComponent(mod, this, moduleRenderY);
             this.modules.add(b);
             moduleRenderY += 16;
@@ -93,19 +92,19 @@ public class CategoryComponent {
             ModuleComponent manager = new ModuleComponent(isProfile ? new Manager() : new keystrokesmod.script.Manager(), this, moduleRenderY);
             this.modules.add(manager);
 
-            if ((Raven.profileManager == null && isProfile) || (Raven.scriptManager == null && !isProfile)) {
+            if ((Technicality.profileManager == null && isProfile) || (Technicality.scriptManager == null && !isProfile)) {
                 return;
             }
 
             if (isProfile) {
-                for (Profile profile : Raven.profileManager.profiles) {
+                for (Profile profile : Technicality.profileManager.profiles) {
                     moduleRenderY += 16;
                     ModuleComponent b = new ModuleComponent(profile.getModule(), this, moduleRenderY);
                     this.modules.add(b);
                 }
             }
             else {
-                Collection<Module> modulesCollection = Raven.scriptManager.scripts.values();
+                Collection<Module> modulesCollection = Technicality.scriptManager.scripts.values();
                 List<Module> sortedModules = modulesCollection.stream().sorted(Comparator.comparing(Module::getName, String.CASE_INSENSITIVE_ORDER)).collect(Collectors.toList());
                 for (Module module : sortedModules) {
                     moduleRenderY += 16;
@@ -245,9 +244,7 @@ public class CategoryComponent {
         GL11.glPushMatrix();
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         RenderUtils.scissor(0, this.y - 2, this.x + this.width + 4, extra - this.y + 4);
-        RenderUtils.drawRoundedGradientOutlinedRectangle(this.x - 2, this.y, this.x + this.width + 2, extra, 10, translucentBackground,
-                ((opened || hovering) && Gui.rainBowOutlines.isToggled()) ? RenderUtils.setAlpha(Utils.getChroma(2, 0), 0.5) : regularOutline, ((opened || hovering) && Gui.rainBowOutlines.isToggled()) ? RenderUtils.setAlpha(Utils.getChroma(2, 700), 0.5) : regularOutline2);
-        renderItemForCategory(this.category, (int) (this.x + 1), (int) (this.y + 4), opened || hovering);
+        RoundedUtils.drawRound(this.x - 2, this.y, this.width + 4, extra - this.y, 0, new Color(0, 0, 0, 110));
         renderer.drawString(this.category.name(), namePos, (float) (this.y + 4), categoryNameColor, false);
         RenderUtils.scissor(0, this.y + this.titleHeight + 3, this.x + this.width + 4, extra - this.y - 4 - this.titleHeight);
 

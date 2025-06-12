@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.PostMotionEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.SendPacketEvent;
@@ -57,7 +57,7 @@ public class JumpReset extends Module {
             if (!ignoreNext && onGround && aimingAt && forward && mouseDown && Utils.randomizeDouble(0, 100) < chance.getInput() && !hasBadEffect()) {
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), setJump = true);
                 KeyBinding.onTick(mc.gameSettings.keyBindJump.getKeyCode());
-                if (Raven.debug) {
+                if (Technicality.debug) {
                     Utils.sendModuleMessage(this, "&7jumping enabled");
                 }
             }
@@ -72,7 +72,7 @@ public class JumpReset extends Module {
     public void onPostMotion(PostMotionEvent e) {
         if (setJump && !Utils.jumpDown()) {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), setJump = false);
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 Utils.sendModuleMessage(this, "&7jumping disabled");
             }
         }

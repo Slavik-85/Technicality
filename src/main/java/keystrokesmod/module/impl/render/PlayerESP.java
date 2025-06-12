@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.render;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.mixin.impl.accessor.IAccessorEntityRenderer;
 import keystrokesmod.mixin.impl.accessor.IAccessorMinecraft;
 import keystrokesmod.module.Module;
@@ -105,7 +105,7 @@ public class PlayerESP extends Module {
         this.renderAsTwoD.clear();
         if (Utils.nullCheck()) {
             int rgb = rainbow.isToggled() ? Utils.getChroma(2L, 0L) : this.rgb_c;
-            if (Raven.debug) {
+            if (Technicality.debug) {
                 for (final Entity entity : mc.theWorld.loadedEntityList) {
                     if (entity instanceof EntityLivingBase && entity != mc.thePlayer) {
                         if (teamColor.isToggled()) {

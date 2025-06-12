@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.combat;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.mixin.impl.accessor.IAccessorMinecraft;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
@@ -34,7 +34,7 @@ public class BurstClicker extends Module {
     @Override
     public void onEnable() {
         if (clicks.getInput() != 0.0D && mc.currentScreen == null && mc.inGameHasFocus) {
-            Raven.getScheduledExecutor().execute(() -> {
+            Technicality.getScheduledExecutor().execute(() -> {
                 try {
                     int cl = (int) clicks.getInput();
                     int del = (int) delay.getInput();

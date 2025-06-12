@@ -1,6 +1,6 @@
 package keystrokesmod.script;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.clickgui.components.impl.ModuleComponent;
@@ -64,10 +64,10 @@ public class ScriptDefaults {
 
     public static void reloadModules() {
         modulesMap.clear();
-        for (Module module : Raven.getModuleManager().getModules()) {
+        for (Module module : Technicality.getModuleManager().getModules()) {
             modulesMap.put(module.getName(), module);
         }
-        for (Module module : Raven.scriptManager.scripts.values()) {
+        for (Module module : Technicality.scriptManager.scripts.values()) {
             modulesMap.put(module.getName(), module);
         }
     }

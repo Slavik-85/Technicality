@@ -1,6 +1,6 @@
 package keystrokesmod.utility;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import net.minecraft.network.Packet;
 
 import java.util.ArrayList;
@@ -15,13 +15,13 @@ public class PacketUtils {
             return;
         }
         skipSendEvent.add(packet);
-        Raven.mc.thePlayer.sendQueue.addToSendQueue(packet);
+        Technicality.mc.thePlayer.sendQueue.addToSendQueue(packet);
     }
 
     public static void receivePacketNoEvent(Packet packet) {
         try {
             skipReceiveEvent.add(packet);
-            packet.processPacket(Raven.mc.getNetHandler());
+            packet.processPacket(Technicality.mc.getNetHandler());
         }
         catch (Exception e) {
             e.printStackTrace();

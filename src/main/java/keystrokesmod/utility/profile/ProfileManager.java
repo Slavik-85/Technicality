@@ -1,7 +1,7 @@
 package keystrokesmod.utility.profile;
 
 import com.google.gson.*;
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.ClickGui;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.event.PostProfileLoadEvent;
@@ -49,15 +49,15 @@ public class ProfileManager {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("keybind", profile.getModule().getKeycode());
         JsonArray jsonArray = new JsonArray();
-        for (Module module : Raven.moduleManager.getModules()) {
+        for (Module module : Technicality.moduleManager.getModules()) {
             if (module.ignoreOnSave) {
                 continue;
             }
             JsonObject moduleInformation = getJsonObject(module);
             jsonArray.add(moduleInformation);
         }
-        if (Raven.scriptManager != null && Raven.scriptManager.scripts != null) {
-            for (Module module : Raven.scriptManager.scripts.values()) {
+        if (Technicality.scriptManager != null && Technicality.scriptManager.scripts != null) {
+            for (Module module : Technicality.scriptManager.scripts.values()) {
                 if (module.ignoreOnSave) {
                     continue;
                 }
@@ -125,15 +125,15 @@ public class ProfileManager {
             if (!file.getName().equals(name + ".json")) {
                 continue;
             }
-            if (Raven.scriptManager != null) {
-                for (Module module : Raven.scriptManager.scripts.values()) {
+            if (Technicality.scriptManager != null) {
+                for (Module module : Technicality.scriptManager.scripts.values()) {
                     if (module.canBeEnabled()) {
                         module.disable();
                         module.setBind(0);
                     }
                 }
             }
-            for (Module module : Raven.getModuleManager().getModules()) {
+            for (Module module : Technicality.getModuleManager().getModules()) {
                 if (module.canBeEnabled()) {
                     module.disable();
                     module.setBind(0);
@@ -160,9 +160,9 @@ public class ProfileManager {
                         continue;
                     }
 
-                    Module module = Raven.moduleManager.getModule(moduleName);
-                    if (module == null && moduleName.startsWith("sc-") && Raven.scriptManager != null) {
-                        for (Module module1 : Raven.scriptManager.scripts.values()) {
+                    Module module = Technicality.moduleManager.getModule(moduleName);
+                    if (module == null && moduleName.startsWith("sc-") && Technicality.scriptManager != null) {
+                        for (Module module1 : Technicality.scriptManager.scripts.values()) {
                             if (module1.getName().equals(moduleName.substring(3))) {
                                 module = module1;
                             }
@@ -256,9 +256,9 @@ public class ProfileManager {
                         setting.loadProfile(moduleInformation);
                     }
 
-                    Raven.currentProfile = getProfile(name);
+                    Technicality.currentProfile = getProfile(name);
                 }
-                MinecraftForge.EVENT_BUS.post(new PostProfileLoadEvent(Raven.currentProfile.getName()));
+                MinecraftForge.EVENT_BUS.post(new PostProfileLoadEvent(Technicality.currentProfile.getName()));
             }
             catch (Exception e) {
                 failedMessage("load", name);
@@ -314,12 +314,12 @@ public class ProfileManager {
                 }
             }
 
-            for (CategoryComponent categoryComponent : Raven.clickGui.categories) {
+            for (CategoryComponent categoryComponent : Technicality.clickGui.categories) {
                 if (categoryComponent.category == Module.category.profiles) {
                     categoryComponent.reloadModules(true);
                 }
             }
-            Utils.sendMessage("&b" + Raven.profileManager.getProfileFiles().size() + " &7profiles loaded.");
+            Utils.sendMessage("&b" + Technicality.profileManager.getProfileFiles().size() + " &7profiles loaded.");
         }
     }
 
