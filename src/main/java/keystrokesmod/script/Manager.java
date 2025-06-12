@@ -1,6 +1,6 @@
 package keystrokesmod.script;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
@@ -25,7 +25,7 @@ public class Manager extends Module {
     public static ButtonSetting enableHttpRequests;
     public static ButtonSetting enableWebSockets;
 
-    public final String DOCUMENTATION_URL = "https://blowsy.gitbook.io/raven";
+    public final String DOCUMENTATION_URL = "https://blowsy.gitbook.io/technicality";
     private final String CONFIG_DIR = mc.mcDataDir + File.separator + "keystrokes" + File.separator + "settings.txt";
     private final String SEPARATOR = ":";
     private final String SEPARATOR_FULL = SEPARATOR + " ";
@@ -35,27 +35,27 @@ public class Manager extends Module {
     public Manager() {
         super("Manager", category.scripts);
         this.registerSetting(new ButtonSetting("Load scripts", () -> {
-            if (Raven.scriptManager.compiler == null) {
+            if (Technicality.scriptManager.compiler == null) {
                 Utils.sendMessage("&cCompiler error, JDK not found");
             }
             else {
                 final long currentTimeMillis = System.currentTimeMillis();
                 if (Utils.timeBetween(this.lastLoad, currentTimeMillis) > 1500) {
                     this.lastLoad = currentTimeMillis;
-                    Raven.scriptManager.loadScripts();
-                    if (Raven.scriptManager.scripts.isEmpty()) {
+                    Technicality.scriptManager.loadScripts();
+                    if (Technicality.scriptManager.scripts.isEmpty()) {
                         Utils.sendMessage("&7No scripts found.");
                     }
                     else {
                         double timeTaken = Utils.round((System.currentTimeMillis() - currentTimeMillis) / 1000.0, 1);
-                        Utils.sendMessage("&7Loaded &b" + Raven.scriptManager.scripts.size() + " &7script" + ((Raven.scriptManager.scripts.size() == 1) ? "" : "s") + " in &b" + Utils.asWholeNum(timeTaken) + "&7s.");
+                        Utils.sendMessage("&7Loaded &b" + Technicality.scriptManager.scripts.size() + " &7script" + ((Technicality.scriptManager.scripts.size() == 1) ? "" : "s") + " in &b" + Utils.asWholeNum(timeTaken) + "&7s.");
                     }
                     Entity.clearCache();
                     NetworkPlayer.clearCache();
                     Image.clearCache();
                     ScriptDefaults.reloadModules();
-                    if (Raven.currentProfile != null && Raven.currentProfile.getModule() != null) {
-                        ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                    if (Technicality.currentProfile != null && Technicality.currentProfile.getModule() != null) {
+                        ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                     }
                 }
                 else {
@@ -65,10 +65,10 @@ public class Manager extends Module {
         }));
         this.registerSetting(new ButtonSetting("Open folder", () -> {
             try {
-                Desktop.getDesktop().open(Raven.scriptManager.directory);
+                Desktop.getDesktop().open(Technicality.scriptManager.directory);
             }
             catch (IOException ex) {
-                Raven.scriptManager.directory.mkdirs();
+                Technicality.scriptManager.directory.mkdirs();
                 Utils.sendMessage("&cError locating folder, recreated.");
             }
         }));

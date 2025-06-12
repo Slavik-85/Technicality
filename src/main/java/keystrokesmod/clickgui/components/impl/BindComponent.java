@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.impl.client.Gui;
@@ -43,10 +43,10 @@ public class BindComponent extends Component {
         GL11.glPushMatrix();
         GL11.glScaled(0.5D, 0.5D, 0.5D);
         if (keySetting == null) {
-            this.drawString(!this.moduleComponent.mod.canBeEnabled() && this.moduleComponent.mod.script == null ? "Module cannot be bound." : this.isBinding ? "Press a key..." : "Current bind: '§e" + getKeyAsStr(false) + "§r'");
+            this.drawString(!this.moduleComponent.mod.canBeEnabled() && this.moduleComponent.mod.script == null ? "Module cannot be bound." : this.isBinding ? "Press a key..." : "Current bind: '" + getKeyAsStr(false) + "'");
         }
         else {
-            Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(this.isBinding ? "Press a key..." : this.keySetting.getName() + ": '§e" + getKeyAsStr(true) + "§r'", (float) ((this.moduleComponent.categoryComponent.getX() + 4) * 2) + xOffset, (float) ((this.moduleComponent.categoryComponent.getY() + this.o + (this.keySetting == null ? 3 : 4)) * 2), Theme.getGradient(Theme.descriptor[0], Theme.descriptor[1], 0));
+            Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(this.isBinding ? "Press a key..." : this.keySetting.getName() + ": '" + getKeyAsStr(true) + "'", (float) ((this.moduleComponent.categoryComponent.getX() + 4) * 2) + xOffset, (float) ((this.moduleComponent.categoryComponent.getY() + this.o + (this.keySetting == null ? 3 : 4)) * 2), -1);
         }
         GL11.glPopMatrix();
     }
@@ -63,8 +63,8 @@ public class BindComponent extends Component {
             }
             else if (button == 1 && this.moduleComponent.mod.moduleCategory() != Module.category.profiles && this.keySetting == null) {
                 this.moduleComponent.mod.setHidden(!this.moduleComponent.mod.isHidden());
-                if (Raven.currentProfile != null) {
-                    ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                if (Technicality.currentProfile != null) {
+                    ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                 }
             }
             else if (button > 1) {
@@ -75,8 +75,8 @@ public class BindComponent extends Component {
                     else {
                         this.moduleComponent.mod.setBind(button + 1000);
                     }
-                    if (Raven.currentProfile != null) {
-                        ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                    if (Technicality.currentProfile != null) {
+                        ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                     }
                     this.isBinding = false;
                 }
@@ -93,8 +93,8 @@ public class BindComponent extends Component {
             else {
                 this.moduleComponent.mod.setBind(scroll > 0 ? 1069 : 1070); // might cause issues if your mouse has more than 69 buttons for some reason???
             }
-            if (Raven.currentProfile != null) {
-                ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+            if (Technicality.currentProfile != null) {
+                ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
             }
             this.isBinding = false;
         }
@@ -114,13 +114,13 @@ public class BindComponent extends Component {
                         this.moduleComponent.mod.setBind(0);
                     }
                 }
-                if (Raven.currentProfile != null) {
-                    ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                if (Technicality.currentProfile != null) {
+                    ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                 }
             }
             else {
-                if (Raven.currentProfile != null) {
-                    ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                if (Technicality.currentProfile != null) {
+                    ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                 }
                 if (this.keySetting != null) {
                     this.keySetting.setKey(keybind);
@@ -161,7 +161,7 @@ public class BindComponent extends Component {
     }
 
     private void drawString(String s) {
-        Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(s, (float) ((this.moduleComponent.categoryComponent.getX() + 4) * 2) + xOffset, (float) ((this.moduleComponent.categoryComponent.getY() + this.o + (this.keySetting == null ? 3 : 4)) * 2), !this.moduleComponent.mod.hidden ? Theme.getGradient(Theme.descriptor[0], Theme.descriptor[1], 0) : Theme.getGradient(Theme.hiddenBind[0], Theme.hiddenBind[1], 0));
+        Minecraft.getMinecraft().fontRendererObj.drawStringWithShadow(s, (float) ((this.moduleComponent.categoryComponent.getX() + 4) * 2) + xOffset, (float) ((this.moduleComponent.categoryComponent.getY() + this.o + (this.keySetting == null ? 3 : 4)) * 2), -1);
     }
 
     public void onGuiClosed() {

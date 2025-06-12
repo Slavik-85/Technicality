@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.client;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.DescriptionSetting;
@@ -68,9 +68,9 @@ public class Settings extends Module {
             for (int i = 1; i < capes.length; i++) {
                 String name = capes[i].toLowerCase();
                 if (i > 1) {
-                    name = "rvn_" + name;
+                    name = "technicality_" + name;
                 }
-                InputStream stream = Raven.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + name + ".png");
+                InputStream stream = Technicality.class.getResourceAsStream("/assets/keystrokesmod/textures/capes/" + name + ".png");
                 if (stream == null) {
                     continue;
                 }

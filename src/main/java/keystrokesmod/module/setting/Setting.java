@@ -1,7 +1,7 @@
 package keystrokesmod.module.setting;
 
 import com.google.gson.JsonObject;
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.impl.CategoryComponent;
 import keystrokesmod.clickgui.components.impl.ModuleComponent;
 import keystrokesmod.module.Module;
@@ -19,7 +19,7 @@ public abstract class Setting {
             return;
         }
         this.visible = visible;
-        for (CategoryComponent categoryComponent : Raven.clickGui.categories) {
+        for (CategoryComponent categoryComponent : Technicality.clickGui.categories) {
             if (categoryComponent.category == module.moduleCategory()) {
                 for (ModuleComponent moduleComponent : categoryComponent.modules) {
                     if (moduleComponent.mod.getName().equals(module.getName())) {

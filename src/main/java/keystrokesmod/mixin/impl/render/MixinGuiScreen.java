@@ -1,6 +1,6 @@
 package keystrokesmod.mixin.impl.render;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.KeyPressEvent;
 import keystrokesmod.module.ModuleManager;
 import net.minecraft.client.Minecraft;
@@ -24,7 +24,7 @@ public abstract class MixinGuiScreen
         if (msg.startsWith(".") && addToChat && ModuleManager.canExecuteChatCommand()) {
             this.mc.ingameGUI.getChatGUI().addToSentMessages(msg);
 
-            Raven.commandManager.executeCommand(msg);
+            Technicality.commandManager.executeCommand(msg);
             callbackInfo.cancel();
         }
     }

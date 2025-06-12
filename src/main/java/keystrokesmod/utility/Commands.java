@@ -1,6 +1,6 @@
 package keystrokesmod.utility;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.helper.PingHelper;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.ModuleManager;
@@ -51,7 +51,7 @@ public class Commands {
 
                 print("Setting...", 1);
                 n = args[1];
-                Raven.getScheduledExecutor().execute(() -> {
+                Technicality.getScheduledExecutor().execute(() -> {
                     if (NetworkUtils.isHypixelKeyValid(n)) {
                         NetworkUtils.API_KEY = n;
                         print("&a" + "success!", 0);
@@ -129,7 +129,7 @@ public class Commands {
 
                 n = args[1];
                 print("Retrieving data...", 1);
-                Raven.getScheduledExecutor().execute(() -> {
+                Technicality.getScheduledExecutor().execute(() -> {
                     int[] s = ProfileUtils.getHypixelStats(n, ProfileUtils.DM.OVERALL);
                     if (s != null) {
                         if (s[0] == -1) {
@@ -258,7 +258,7 @@ public class Commands {
                     return;
                 }
 
-                for (Module module : Raven.getModuleManager().getModules()) {
+                for (Module module : Technicality.getModuleManager().getModules()) {
                     String name = module.getName().toLowerCase().replace(" ", "");
                     if (name.equals(args[1].toLowerCase())) {
                         module.setHidden(true);
@@ -277,7 +277,7 @@ public class Commands {
                     return;
                 }
 
-                for (Module module : Raven.getModuleManager().getModules()) {
+                for (Module module : Technicality.getModuleManager().getModules()) {
                     String name = module.getName().toLowerCase().replace(" ", "");
                     if (name.equals(args[1].toLowerCase())) {
                         module.setHidden(false);
@@ -337,18 +337,18 @@ public class Commands {
                 }
             }
             else if (cm.startsWith("Debug".toLowerCase())) {
-                Raven.debug = !Raven.debug;
-                print("Debug " + (Raven.debug ? "enabled" : "disabled") + ".", 1);
+                Technicality.debug = !Technicality.debug;
+                print("Debug " + (Technicality.debug ? "enabled" : "disabled") + ".", 1);
             }
             else if (cm.startsWith("profiles") || cm.startsWith("p")) {
                 if (!hasArgs) {
                     print("&aAvailable profiles:", 1);
-                    if (Raven.profileManager.profiles.isEmpty()) {
+                    if (Technicality.profileManager.profiles.isEmpty()) {
                         print("None", 0);
                         return;
                     }
-                    for (int i = 0; i < Raven.profileManager.profiles.size(); ++i) {
-                        print(i + 1 + ". " + Raven.profileManager.profiles.get(i).getName(), 0);
+                    for (int i = 0; i < Technicality.profileManager.profiles.size(); ++i) {
+                        print(i + 1 + ". " + Technicality.profileManager.profiles.get(i).getName(), 0);
                     }
                 }
                 else if (args.length > 1) {
@@ -362,10 +362,10 @@ public class Commands {
                             print("&cInvalid name.", 1);
                             return;
                         }
-                        Raven.profileManager.saveProfile(new Profile(name, 0));
+                        Technicality.profileManager.saveProfile(new Profile(name, 0));
                         print("&aSaved profile:", 1);
                         print(name, 0);
-                        Raven.profileManager.loadProfiles();
+                        Technicality.profileManager.loadProfiles();
                     }
                     else if (args[1].equals("load") || args[1].equals("l")) {
                         if (args.length != 3) {
@@ -373,9 +373,9 @@ public class Commands {
                             return;
                         }
                         String name = args[2];
-                        for (Profile profile : Raven.profileManager.profiles) {
+                        for (Profile profile : Technicality.profileManager.profiles) {
                             if (profile.getName().equals(name)) {
-                                Raven.profileManager.loadProfile(profile.getName());
+                                Technicality.profileManager.loadProfile(profile.getName());
                                 print("&aLoaded profile:", 1);
                                 print(name, 0);
                                 if (Settings.sendMessage.isToggled()) {
@@ -392,12 +392,12 @@ public class Commands {
                             return;
                         }
                         String name = args[2];
-                        for (Profile profile : Raven.profileManager.profiles) {
+                        for (Profile profile : Technicality.profileManager.profiles) {
                             if (profile.getName().equals(name)) {
-                                Raven.profileManager.deleteProfile(profile.getName());
+                                Technicality.profileManager.deleteProfile(profile.getName());
                                 print("&aRemoved profile:", 1);
                                 print(name, 0);
-                                Raven.profileManager.loadProfiles();
+                                Technicality.profileManager.loadProfiles();
                                 return;
                             }
                         }

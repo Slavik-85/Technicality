@@ -1,6 +1,6 @@
 package keystrokesmod.helper;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.utility.RenderUtils;
 import keystrokesmod.utility.Utils;
 import net.minecraft.client.Minecraft;
@@ -14,7 +14,7 @@ public class DebugHelper {
 
     @SubscribeEvent
     public void onRenderTick(TickEvent.RenderTickEvent ev) {
-        if (!Raven.debug || ev.phase != TickEvent.Phase.END || !Utils.nullCheck()) {
+        if (!Technicality.debug || ev.phase != TickEvent.Phase.END || !Utils.nullCheck()) {
             return;
         }
         if (mc.currentScreen == null) {

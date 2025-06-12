@@ -1,6 +1,6 @@
 package keystrokesmod.module.impl.player;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.event.PreMotionEvent;
 import keystrokesmod.event.PreUpdateEvent;
 import keystrokesmod.event.ReceivePacketEvent;
@@ -252,7 +252,7 @@ public class NoFall extends Module {
         if (!blinkedPackets.isEmpty()) {
             synchronized (blinkedPackets) {
                 for (Packet packet : blinkedPackets) {
-                    Raven.packetsHandler.handlePacket(packet);
+                    Technicality.packetsHandler.handlePacket(packet);
                     PacketUtils.sendPacketNoEvent(packet);
                 }
             }
@@ -267,7 +267,7 @@ public class NoFall extends Module {
         if (!regularPackets.isEmpty()) {
             synchronized (regularPackets) {
                 for (Packet packet : regularPackets) {
-                    Raven.packetsHandler.handlePacket(packet);
+                    Technicality.packetsHandler.handlePacket(packet);
                     PacketUtils.sendPacketNoEvent(packet);
                 }
             }
@@ -280,14 +280,14 @@ public class NoFall extends Module {
         if (mc.thePlayer.onGround) {
             synchronized (blinkedPackets) {
                 for (Packet packet : blinkedPackets) {
-                    Raven.packetsHandler.handlePacket(packet);
+                    Technicality.packetsHandler.handlePacket(packet);
                     PacketUtils.sendPacketNoEvent(packet);
                 }
             }
         } else {
             synchronized (regularPackets) {
                 for (Packet packet : regularPackets) {
-                    Raven.packetsHandler.handlePacket(packet);
+                    Technicality.packetsHandler.handlePacket(packet);
                     PacketUtils.sendPacketNoEvent(packet);
                 }
             }

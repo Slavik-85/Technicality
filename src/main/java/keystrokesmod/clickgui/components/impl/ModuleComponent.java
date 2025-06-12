@@ -1,6 +1,6 @@
 package keystrokesmod.clickgui.components.impl;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.clickgui.components.Component;
 import keystrokesmod.module.Module;
 import keystrokesmod.module.setting.Setting;
@@ -20,10 +20,10 @@ import java.util.Iterator;
 public class ModuleComponent extends Component {
     private int originalHoverAlpha = 120;
     private final int hoverColor = (new Color(0, 0, 0, originalHoverAlpha)).getRGB();
-    private final int unsavedColor = new Color(114, 188, 250).getRGB();
-    private final int invalidColor = new Color(255, 80, 80).getRGB();
-    private final int enabledColor = new Color(24, 154, 255).getRGB();
-    private final int disabledColor = new Color(192, 192, 192).getRGB();
+    private final int unsavedColor = Color.white.getRGB();
+    private final int invalidColor = Color.white.getRGB();
+    private final int enabledColor = Color.white.getRGB();
+    private final int disabledColor = Color.white.getRGB();
     public Module mod;
     public CategoryComponent categoryComponent;
     public float yPos;
@@ -118,7 +118,7 @@ public class ModuleComponent extends Component {
         if (this.mod.script != null && this.mod.script.error) {
             button_rgb = invalidColor;
         }
-        if (this.mod.moduleCategory() == Module.category.profiles && !(this.mod instanceof Manager) && !((ProfileModule) this.mod).saved && Raven.currentProfile.getModule() == this.mod) {
+        if (this.mod.moduleCategory() == Module.category.profiles && !(this.mod instanceof Manager) && !((ProfileModule) this.mod).saved && Technicality.currentProfile.getModule() == this.mod) {
             button_rgb = unsavedColor;
         }
 
@@ -253,8 +253,8 @@ public class ModuleComponent extends Component {
         if (this.overModuleName(x, y) && mouse == 0 && this.mod.canBeEnabled()) {
             this.mod.toggle();
             if (this.mod.moduleCategory() != Module.category.profiles) {
-                if (Raven.currentProfile != null) {
-                    ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+                if (Technicality.currentProfile != null) {
+                    ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
                 }
             }
         }

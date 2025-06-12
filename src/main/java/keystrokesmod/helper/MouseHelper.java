@@ -1,6 +1,6 @@
 package keystrokesmod.helper;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.module.impl.client.Settings;
 import keystrokesmod.module.impl.world.AntiBot;
 import keystrokesmod.utility.Utils;
@@ -29,7 +29,7 @@ public class MouseHelper {
         }
         if (e.button == 0) {
             aL();
-            if (Raven.debug && mc.objectMouseOver != null) {
+            if (Technicality.debug && mc.objectMouseOver != null) {
                 Entity en = mc.objectMouseOver.entityHit;
                 if (en == null || !(en instanceof EntityLivingBase)) {
                     return;

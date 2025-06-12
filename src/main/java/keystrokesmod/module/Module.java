@@ -1,6 +1,6 @@
 package keystrokesmod.module;
 
-import keystrokesmod.Raven;
+import keystrokesmod.Technicality;
 import keystrokesmod.module.setting.Setting;
 import keystrokesmod.module.setting.impl.ButtonSetting;
 import keystrokesmod.module.setting.impl.SliderSetting;
@@ -138,7 +138,7 @@ public class Module {
         }
 
         if (this.script != null) {
-            Raven.scriptManager.onEnable(script);
+            Technicality.scriptManager.onEnable(script);
         }
         else {
             if (!alwaysOn) {
@@ -155,7 +155,7 @@ public class Module {
         this.setEnabled(false);
         ModuleManager.organizedModules.remove(this);
         if (this.script != null) {
-            Raven.scriptManager.onDisable(script);
+            Technicality.scriptManager.onDisable(script);
         }
         else {
             if (!alwaysOn) {
@@ -218,8 +218,8 @@ public class Module {
         } else {
             this.enable();
         }
-        if (Raven.currentProfile != null) {
-            ((ProfileModule) Raven.currentProfile.getModule()).saved = false;
+        if (Technicality.currentProfile != null) {
+            ((ProfileModule) Technicality.currentProfile.getModule()).saved = false;
         }
     }
 
