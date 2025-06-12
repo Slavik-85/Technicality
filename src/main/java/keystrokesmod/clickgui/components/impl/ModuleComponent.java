@@ -20,10 +20,10 @@ import java.util.Iterator;
 public class ModuleComponent extends Component {
     private int originalHoverAlpha = 120;
     private final int hoverColor = (new Color(0, 0, 0, originalHoverAlpha)).getRGB();
-    private final int unsavedColor = new Color(114, 188, 250).getRGB();
-    private final int invalidColor = new Color(255, 80, 80).getRGB();
-    private final int enabledColor = new Color(24, 154, 255).getRGB();
-    private final int disabledColor = new Color(192, 192, 192).getRGB();
+    private final int unsavedColor = Color.white.getRGB();
+    private final int invalidColor = Color.white.getRGB();
+    private final int enabledColor = Color.white.getRGB();
+    private final int disabledColor = Color.white.getRGB();
     public Module mod;
     public CategoryComponent categoryComponent;
     public float yPos;

@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 public class ButtonComponent extends Component {
-    private final int enabledColor = (new Color(20, 255, 0)).getRGB();
+    private final int enabledColor = Color.white.getRGB();
 
     private Module mod;
     public ButtonSetting buttonSetting;
